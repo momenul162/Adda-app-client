@@ -12,6 +12,13 @@ export const fetchPostById = async (postId: string) => {
   return response.data;
 };
 
+/* Add new post api */
+export const addNewPostAPI = async (newPost: {}) => {
+  console.log(newPost);
+  const response = await baseURL.post("/posts", newPost);
+  return response.data;
+};
+
 export const toggleReactionAPI = async (postId: string, userId: string, type: string) => {
   try {
     const response = await baseURL.patch(`/posts/${postId}/react`, { userId, type });

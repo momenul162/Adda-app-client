@@ -58,7 +58,6 @@ const Login = () => {
         }
       } catch (error: any) {
         setLoading(false);
-        console.log(error);
         setError(error?.response?.data?.message);
       }
     }

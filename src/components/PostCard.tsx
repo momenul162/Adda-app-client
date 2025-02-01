@@ -35,11 +35,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       return;
     }
 
-    dispatch(toggleReaction({ postId: post._id, userId: user._id, type }));
+    dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
     setType(type);
   };
 
-  const date = new Date(`${post.date}`);
+  const date = new Date(`${post?.date}`);
 
   const formattedDate = date?.toLocaleString("en-US", {
     year: "2-digit",
@@ -71,23 +71,21 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         </div>
       </CardHeader>
       <CardContent>
-        {post.body && <p className="text-sm p-2">{post.body}</p>}
+        {post.body && <p className="text-sm p-2">{post?.body}</p>}
 
         {post?.image && (
           <div className="mt-2 relative aspect-video overflow-hidden rounded-md">
             <img
-              src={post.image}
+              src={post?.image}
               alt="Post image"
               style={{ objectFit: "cover" }}
               className="rounded-md"
             />
-
-            {/* <video src={post?.video} className="w-full h-full rounded-md" controls autoPlay /> */}
           </div>
         )}
         {post?.video && (
           <div className="mt-2 relative aspect-video overflow-hidden rounded-md">
-            <video src={post?.video} className="w-full h-full rounded-md" controls autoPlay />
+            <video src={post?.video} className="w-full h-full rounded-md" controls />
           </div>
         )}
       </CardContent>

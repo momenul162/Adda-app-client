@@ -1,10 +1,11 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileVideo2, Image, SquarePlay } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import CreatePostModal from "./CreatePostModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { ScrollArea } from "./ui/scroll-area";
 
 const PostInputBox = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -20,6 +21,7 @@ const PostInputBox = () => {
           className="rounded-full w-11 h-11 border hover:border-blue-500"
         />
         {/* Input */}
+
         <Dialog>
           <DialogTrigger asChild>
             <Input
@@ -30,7 +32,10 @@ const PostInputBox = () => {
             />
           </DialogTrigger>
           <DialogContent id="post-input">
-            <CreatePostModal />
+            <DialogTitle></DialogTitle>
+            <ScrollArea className="h-[200px] w-[350px] rounded-md border p-4">
+              <CreatePostModal />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>
@@ -46,7 +51,7 @@ const PostInputBox = () => {
           Live video
         </Button>
 
-        {/* Photo/Video Button */}
+        {/* image/Video Button */}
 
         <Dialog>
           <DialogTrigger asChild>
@@ -59,6 +64,7 @@ const PostInputBox = () => {
             </Button>
           </DialogTrigger>
           <DialogContent id="post-input">
+            <DialogTitle></DialogTitle>
             <CreatePostModal />
           </DialogContent>
         </Dialog>

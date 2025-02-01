@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchPost, fetchPostById, toggleReactionAPI } from "./postAPI";
+import { addNewPostAPI, fetchPost, fetchPostById, toggleReactionAPI } from "./postAPI";
 
 interface Post {
   _id: string;
@@ -7,7 +7,7 @@ interface Post {
     _id?: string;
     username: string;
     country: string;
-    photo: string;
+    image: string;
   };
   image?: string;
   video?: string;
@@ -46,9 +46,23 @@ export const getPostById = createAsyncThunk("posts/fetchPostById", async (postId
 });
 
 export const toggleReaction = createAsyncThunk(
-  "reactions/  reactSlice",
+  "reactions/reactSlice",
   async ({ postId, userId, type }: { postId: string; userId: string; type: string }) => {
     const response = await toggleReactionAPI(postId, userId, type);
+    return response;
+  }
+);
+
+export const addPost = createAsyncThunk(
+  "posts/addPostSlice",
+  async (newPost: {
+    userId: string;
+    visibility: string;
+    body?: string | null;
+    video?: string | null;
+    image?: string | null;
+  }) => {
+    const response = await addNewPostAPI(newPost);
     return response;
   }
 );
@@ -97,12 +111,11 @@ const postSlice = createSlice({
         state.loading = false;
         const updatedPost = action.payload;
 
-        // Find the post in the state and update it
         const index = state.posts.findIndex((post) => post._id === updatedPost._id);
+
         if (index !== -1) {
           state.posts[index] = updatedPost;
         }
-        // Update the reacted post
         if (state.selectedPost?._id === updatedPost._id) {
           state.selectedPost = updatedPost;
         }
@@ -110,6 +123,21 @@ const postSlice = createSlice({
         state.reacted = updatedPost;
       })
       .addCase(toggleReaction.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* Add new */
+      .addCase(addPost.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(addPost.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log(action.payload.post);
+        state.posts.unshift(action.payload.post);
+      })
+      .addCase(addPost.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -25,7 +25,7 @@ interface FormValues {
   email: string;
   phone: string;
   password: string;
-  photo: FileList | null;
+  photo?: FileList | null;
   country: string;
 }
 
@@ -34,26 +34,24 @@ const schema = yup.object().shape({
   email: yup.string().email("Invalid email address").required("Email is required"),
   phone: yup
     .string()
-    .matches(/^[0-9]{10,15}$/, "Phone number must be 10-15 digits")
+    .matches(
+      /^(\+\d{1,3}[- ]?)?\(?\d{1,4}\)?[- ]?\d{1,4}[- ]?\d{1,9}$/,
+      "Enter a valid phone number"
+    )
     .required("Phone number is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
+    .matches(/[a-z]/, "Must contain at least one lowercase letter")
+    .matches(/[0-9]/, "Must contain at least one number")
     .required("Password is required"),
   photo: yup
-    .mixed()
-    .test("required", "File is required", (value) => value && value.length > 0)
-    .test(
-      "fileSize",
-      "File size must be less than 2MB",
-      (value) => !value || (value && value[0]?.size <= 2 * 1024 * 1024)
-    )
-    .test(
-      "fileType",
-      "Unsupported file format",
-      (value) =>
-        !value || (value && ["image/jpeg", "image/png", "application/pdf"].includes(value[0]?.type))
-    ),
+    .mixed<FileList>()
+    .nullable()
+    .test("fileSize", "File size must be less than 2MB", (value) => {
+      return !value || (value.length > 0 && value[0].size <= 2 * 1024 * 1024);
+    })
+    .optional(),
   country: yup.string().required("Country is required"),
 });
 
@@ -75,8 +73,15 @@ const Register = () => {
   const country: string = watch("country");
 
   const onSubmit = async (formData: FormValues) => {
-    const photoFile = formData?.photo[0];
+    const photoFile = formData.photo?.[0];
+
+    if (!photoFile) {
+      console.error("No photo selected");
+      return;
+    }
+
     setLoading(true);
+
     const uploadedImageUrl = await uploadToImgBB(photoFile);
 
     if (uploadedImageUrl) {
@@ -85,17 +90,18 @@ const Register = () => {
         photo: uploadedImageUrl,
       };
 
-      console.log(user);
+      try {
+        const { data } = await axios.post("http://localhost:8080/auth/sign-up", user);
 
-      const { data } = await axios.post("http://localhost:8080/auth/sign-up", user);
-
-      if (data) {
+        if (data) {
+          setLoading(false);
+          reset();
+          navigate("/login");
+        }
+      } catch (error) {
+        console.log(error);
         setLoading(false);
-        reset();
-        navigate("/login");
       }
-    } else {
-      console.error("Image upload failed");
     }
   };
 

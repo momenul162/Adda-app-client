@@ -24,7 +24,7 @@ const Home = () => {
       </section>
       <section className="max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-md 2xl:max-w-2xl">
         <PostInputBox />
-        <div>{posts && posts.map((post: any) => <PostCard key={post._id} post={post} />)}</div>
+        <div>{posts && posts.map((post: any) => <PostCard key={post?._id} post={post} />)}</div>
       </section>
     </div>
   );

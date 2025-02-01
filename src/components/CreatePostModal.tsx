@@ -1,4 +1,4 @@
-import { FileVideo, ImageUp } from "lucide-react";
+import { FileVideo, ImageUp, Loader2 } from "lucide-react";
 import { TooltipComp } from "./Tooltip";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -11,85 +11,121 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useRef, useState } from "react";
+import { DialogClose } from "./ui/dialog";
+import uploadToCloudinary from "./updload-widget/UploadWidget";
+import { addPost } from "@/features/posts/postSlice";
+import { useNavigate } from "react-router-dom";
+
+interface FormValues {
+  visibility: string;
+  body?: string;
+  image?: FileList | null;
+  video?: FileList | null;
+}
+
+const schema = yup.object().shape({
+  visibility: yup.string().default("PUBLIC").required("Visibility is required"),
+  body: yup.string().optional(),
+  image: yup
+    .mixed<FileList>()
+    .nullable()
+    .test("fileSize", "File size must be less than 5MB", (value) => {
+      return !value || (value.length > 0 && value[0].size <= 5 * 1024 * 1024);
+    })
+    .optional(),
+  video: yup
+    .mixed<FileList>()
+    .nullable()
+    .test("fileSize", "Video size must be less than 20MB", (value) => {
+      return !value || (value.length > 0 && value[0].size <= 20 * 1024 * 1024);
+    })
+    .optional(),
+});
 
 const CreatePostModal = () => {
-  const { handleSubmit, setValue, watch, register } = useForm();
+  const [loading, setLoading] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { register, handleSubmit, setValue, watch } = useForm<FormValues>({
+    resolver: yupResolver(schema),
+  });
 
-  // State to store file previews
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-
-  // Refs for file input
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle file selection
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: "image" | "video"
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const previewURL = URL.createObjectURL(file);
-      if (type === "image") {
-        setSelectedImage(previewURL);
-      } else {
-        setSelectedVideo(previewURL);
-      }
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+
+  const onSubmit = async (data: FormValues) => {
+    if (!user?._id) {
+      console.error("User ID is missing");
+      return;
     }
-  };
 
-  // Handle form submission
-  const onSubmit = (data: any) => {
-    console.log("Form Data:", data);
-    console.log("Selected Image:", selectedImage);
-    console.log("Selected Video:", selectedVideo);
+    let imageUrl: string | null = null;
+    let videoUrl: string | null = null;
 
-    // Here, you can send the data to an API endpoint
+    setLoading(true);
+
+    if (imageFile) {
+      imageUrl = await uploadToCloudinary(imageFile, "image");
+    }
+
+    if (videoFile) {
+      videoUrl = await uploadToCloudinary(videoFile, "video");
+    }
+
+    const payload = {
+      userId: user._id,
+      visibility: data.visibility,
+      body: data.body,
+      image: imageUrl || null,
+      video: videoUrl || null,
+    };
+
+    dispatch(addPost(payload)).then(() => {
+      setLoading(false);
+      navigate("/");
+    });
   };
 
   return (
     <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
-      {/* Modal Container */}
       <div className="bg-white rounded-lg w-full max-w-lg shadow-md">
-        {/* Header */}
-        <div className="flex justify-between items-center px-4 py-3 border-b">
-          <h2 className="text-lg font-semibold">Create post</h2>
-          <button className="text-gray-500 hover:text-gray-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              className="w-6 h-6"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex justify-between items-center px-4 py-3 border-b">
+            <h2 className="text-lg font-semibold">Create post</h2>
+            <DialogClose asChild>
+              <button className="text-gray-500 text-xl font-extrabold hover:text-red-600">
+                &times;
+              </button>
+            </DialogClose>
+          </div>
 
-        {/* Body */}
-        <div className="p-4">
-          {/* User Info */}
-          <div className="flex items-center space-x-3 mb-4">
-            <Avatar>
-              <AvatarImage src={user?.photo}></AvatarImage>
-            </Avatar>
-            <div>
-              <p className="font-semibold">{user?.username}</p>
-              <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="p-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <Avatar>
+                <AvatarImage src={user?.photo} />
+              </Avatar>
+              <div>
+                <p className="font-semibold">{user?.username}</p>
                 <Select
-                  value={watch("visibility") || ""}
+                  value={watch("visibility") || "PUBLIC"}
                   onValueChange={(value) => setValue("visibility", value, { shouldValidate: true })}
                 >
-                  <SelectTrigger className="item-center pl-0 pr-20 py-0 border-none shadow-none text-blue-500">
+                  <SelectTrigger className="pl-0 pr-20 py-0 border-none shadow-none text-blue-500">
                     <SelectValue placeholder="Public" />
                   </SelectTrigger>
-
                   <SelectContent>
                     <SelectGroup>
                       <SelectItem value="PUBLIC">Public</SelectItem>
@@ -98,90 +134,110 @@ const CreatePostModal = () => {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </form>
+              </div>
             </div>
+
+            <Textarea
+              placeholder={`What's on your mind, ${user?.username}?`}
+              {...register("body")}
+            />
+
+            <div className="flex items-center space-x-3 mt-10 mb-4">
+              <Button variant="ghost">Add to your post</Button>
+              <div className="flex items-center">
+                <TooltipComp
+                  variant="outline"
+                  style="text-blue-500 border-none"
+                  button={
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        imageInputRef.current?.click();
+                      }}
+                    >
+                      <ImageUp size={24} />
+                    </div>
+                  }
+                  hover="Image"
+                />
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={async (e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                      setImageFile(files[0]);
+                      setSelectedImage(URL.createObjectURL(files[0]));
+                    }
+                  }}
+                />
+
+                <TooltipComp
+                  variant="outline"
+                  style="text-green-500 border-none"
+                  button={
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        videoInputRef.current?.click();
+                      }}
+                    >
+                      <FileVideo size={24} />
+                    </div>
+                  }
+                  hover="Video"
+                />
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={async (e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                      setVideoFile(files[0]);
+                      setSelectedVideo(URL.createObjectURL(files[0]));
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                className="max-w-full max-h-[300px] mt-2 rounded-md"
+                alt="Preview"
+              />
+            )}
+            {selectedVideo && (
+              <video
+                src={selectedVideo}
+                controls
+                className="max-w-full max-h-[300px] mt-2 rounded-md"
+              />
+            )}
           </div>
 
-          {/* Input */}
-          <Textarea
-            id="post"
-            placeholder={`What's on your mind, ${user?.username}?`}
-            {...register("postText")}
-          />
-
-          {/* Add to Post Section */}
-          <div className="flex items-center space-x-3 mt-10 mb-4">
-            <Button variant="ghost" className="flex items-center space-x-2">
-              <span className="text-gray-700">Add to your post</span>
-            </Button>
-            <div className="flex items-center">
-              {/* Image Upload Button */}
-              <TooltipComp
-                variant={"outline"}
-                style={"text-blue-500 border-none"}
-                button={
-                  <button onClick={() => imageInputRef.current?.click()} type="button">
-                    <ImageUp size={48} strokeWidth={3} />
-                  </button>
-                }
-                hover={"Image"}
-              />
-
-              {/* Hidden Input for Image */}
-              <input
-                type="file"
-                accept="image/*"
-                ref={imageInputRef}
-                className="hidden"
-                onChange={(e) => handleFileChange(e, "image")}
-              />
-
-              {/* Video Upload Button */}
-              <TooltipComp
-                variant={"outline"}
-                style={"text-green-500 border-none"}
-                button={
-                  <button onClick={() => videoInputRef.current?.click()} type="button">
-                    <FileVideo size={48} strokeWidth={3} />
-                  </button>
-                }
-                hover={"Video"}
-              />
-
-              {/* Hidden Input for Video */}
-              <input
-                type="file"
-                accept="video/*"
-                ref={videoInputRef}
-                className="hidden"
-                onChange={(e) => handleFileChange(e, "video")}
-              />
-            </div>
+          <div className="p-4 border-t">
+            <DialogClose asChild>
+              <Button type="submit" variant="secondary" className="w-full rounded-lg">
+                {loading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <Loader2 className="animate-spin" />
+                    <span>Posting...</span>
+                  </div>
+                ) : (
+                  "Post"
+                )}
+              </Button>
+            </DialogClose>
           </div>
-
-          {/* Preview Section */}
-          {selectedImage && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">Image Preview:</p>
-              <img src={selectedImage} alt="Preview" className="w-full rounded-md mt-2" />
-            </div>
-          )}
-          {selectedVideo && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">Video Preview:</p>
-              <video src={selectedVideo} controls className="w-full rounded-md mt-2" />
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Button type="submit" variant={"secondary"} className="w-full rounded-lg">
-              Post
-            </Button>
-          </form>
-        </div>
+        </form>
       </div>
     </div>
   );
