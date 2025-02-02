@@ -3,6 +3,8 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found/NotFount";
 import Register from "@/pages/Register";
+import Post from "@/pages/searched-post";
+import Videos from "@/pages/Videos";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 const UserRoutes = () => {
@@ -10,9 +12,10 @@ const UserRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          {/* Add other routes here */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/videos" element={<Videos />} />
+          <Route path="/posts/:postId" element={<Post />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Route>

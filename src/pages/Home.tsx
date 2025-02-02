@@ -1,5 +1,5 @@
 import AsideSection from "@/components/AsideSection";
-import PostCard from "@/components/PostCard";
+import PostCard from "@/components/post-card/PostCard";
 import PostInputBox from "@/components/PostInputBox";
 import { fetchCurrentUser } from "@/features/auth/authSlice";
 import { getPosts } from "@/features/posts/postSlice";

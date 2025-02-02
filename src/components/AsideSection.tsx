@@ -34,7 +34,7 @@ const AsideSection = () => {
             </div>
             {/* User Details */}
             <h3 className="text-lg font-bold">{user?.username}</h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 my-2">
               Front-end Developer | JavaScript | React | Student at University of Rajshahi
             </p>
           </CardContent>

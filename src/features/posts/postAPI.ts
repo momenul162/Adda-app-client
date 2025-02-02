@@ -6,6 +6,12 @@ export const fetchPost = async () => {
   return response.data;
 };
 
+// Fetch all posts
+export const deletePostAPI = async (postId: string) => {
+  const response = await baseURL.delete(`/posts/${postId}`);
+  return response.data;
+};
+
 // Fetch a single post by ID
 export const fetchPostById = async (postId: string) => {
   const response = await baseURL.get(`/posts/${postId}`);

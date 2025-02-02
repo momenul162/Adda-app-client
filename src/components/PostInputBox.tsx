@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import CreatePostModal from "./CreatePostModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 const PostInputBox = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -33,8 +33,9 @@ const PostInputBox = () => {
           </DialogTrigger>
           <DialogContent id="post-input">
             <DialogTitle></DialogTitle>
-            <ScrollArea className="h-[200px] w-[350px] rounded-md border p-4">
+            <ScrollArea className="max-h-[600px]">
               <CreatePostModal />
+              <ScrollBar orientation="vertical" />
             </ScrollArea>
           </DialogContent>
         </Dialog>

@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import * as yup from "yup";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,19 +11,8 @@ import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { login } from "@/features/auth/authSlice";
-
-type FormValues = {
-  email: string;
-  password: string;
-};
-
-const schema = yup.object().shape({
-  email: yup.string().email("Invalid email address").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
+import { loginSchema } from "@/model/schema";
+import { LoginFormValues } from "@/model/interface";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,11 +27,11 @@ const Login = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
+  } = useForm<LoginFormValues>({
+    resolver: yupResolver(loginSchema),
   });
 
-  const onSubmit = async (formData: FormValues) => {
+  const onSubmit = async (formData: LoginFormValues) => {
     setLoading(true);
 
     if (formData.email && formData.password) {

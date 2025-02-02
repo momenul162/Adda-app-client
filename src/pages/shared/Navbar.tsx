@@ -9,12 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar } from "@/components/ui/avatar";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { TooltipComp } from "@/components/Tooltip";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { RootState } from "@/store";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -26,6 +27,10 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const handleRefresh = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-2 flex items-center justify-around h-16 relative">
@@ -33,15 +38,21 @@ const Navbar = () => {
         <div className="hidden md:block">
           {/* Logo */}
           <NavLink to={"/"}>
-            <span className="text-xl font-bold cursor-pointer text-blue-600">ADDA</span>
+            <span
+              onClick={handleRefresh}
+              className="text-xl font-bold cursor-pointer text-blue-600"
+            >
+              ADDA
+            </span>
           </NavLink>
         </div>
 
         {/* Center Section: Menu Links (Hidden on Mobile) */}
-        <div className={`bg-white flex items-center gap-4`}>
+        <div className={`bg-white flex items-center gap-1 sm:gap-2 md:gap-4`}>
           <NavLink
             to={"/"}
             className={({ isActive }) => `${isActive ? "bg-[#bccaec] rounded-md" : ""}`}
+            onClick={handleRefresh}
           >
             <TooltipComp
               variant={"outline"}
@@ -53,6 +64,7 @@ const Navbar = () => {
           <NavLink
             to={"/videos"}
             className={({ isActive }) => `${isActive ? "bg-[#bccaec] rounded-full" : ""}`}
+            onClick={handleRefresh}
           >
             <TooltipComp
               variant={"outline"}
@@ -94,43 +106,43 @@ const Navbar = () => {
           </Button> */}
 
           {/* Profile */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              {/* <Button variant="outline">Login</Button> */}
-              <Avatar>
-                {/* <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                  className="rounded-full w-11 h-11 border hover:border-blue-500"
-                /> */}
-                <img
-                  src={user?.photo}
-                  alt="Post Image"
-                  style={{ objectFit: "cover" }}
-                  className="rounded-full w-11 h-11 border hover:border-blue-500"
-                />
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <User /> Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings /> Settings
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel
-                onClick={handleLogout}
-                className="flex items-center gap-2 cursor-default"
-              >
-                Log out <LogOut strokeWidth={2} size={16} />
-              </DropdownMenuLabel>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar>
+                  <img
+                    src={user?.photo}
+                    alt="Post Image"
+                    style={{ objectFit: "cover" }}
+                    className="rounded-full w-11 h-11 border hover:border-blue-500"
+                  />
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-30 bg-white">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <User /> Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings /> Settings
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 cursor-default"
+                >
+                  Log out <LogOut strokeWidth={2} size={16} />
+                </DropdownMenuLabel>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to={"register"}>
+              <Button variant="outline">Create</Button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

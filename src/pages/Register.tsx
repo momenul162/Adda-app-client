@@ -19,41 +19,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { uploadToImgBB } from "@/lib/uploadToImgBB";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-
-interface FormValues {
-  username: string;
-  email: string;
-  phone: string;
-  password: string;
-  photo?: FileList | null;
-  country: string;
-}
-
-const schema = yup.object().shape({
-  username: yup.string().required("Username is required"),
-  email: yup.string().email("Invalid email address").required("Email is required"),
-  phone: yup
-    .string()
-    .matches(
-      /^(\+\d{1,3}[- ]?)?\(?\d{1,4}\)?[- ]?\d{1,4}[- ]?\d{1,9}$/,
-      "Enter a valid phone number"
-    )
-    .required("Phone number is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .matches(/[a-z]/, "Must contain at least one lowercase letter")
-    .matches(/[0-9]/, "Must contain at least one number")
-    .required("Password is required"),
-  photo: yup
-    .mixed<FileList>()
-    .nullable()
-    .test("fileSize", "File size must be less than 2MB", (value) => {
-      return !value || (value.length > 0 && value[0].size <= 2 * 1024 * 1024);
-    })
-    .optional(),
-  country: yup.string().required("Country is required"),
-});
+import { registerSchema } from "@/model/schema";
+import { RegisterFormValues } from "@/model/interface";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -66,13 +33,13 @@ const Register = () => {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: yupResolver(schema),
+  } = useForm<RegisterFormValues>({
+    resolver: yupResolver(registerSchema),
   });
 
   const country: string = watch("country");
 
-  const onSubmit = async (formData: FormValues) => {
+  const onSubmit = async (formData: RegisterFormValues) => {
     const photoFile = formData.photo?.[0];
 
     if (!photoFile) {

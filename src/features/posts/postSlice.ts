@@ -1,22 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { addNewPostAPI, fetchPost, fetchPostById, toggleReactionAPI } from "./postAPI";
-
-interface Post {
-  _id: string;
-  userId: {
-    _id?: string;
-    username: string;
-    country: string;
-    image: string;
-  };
-  image?: string;
-  video?: string;
-  body?: string;
-  visibility: string;
-  date: Date;
-  likes?: [];
-  dislikes?: [];
-}
+import {
+  addNewPostAPI,
+  deletePostAPI,
+  fetchPost,
+  fetchPostById,
+  toggleReactionAPI,
+} from "./postAPI";
+import { Post } from "@/model/interface";
 
 interface PostState {
   posts: Post[];
@@ -24,6 +14,7 @@ interface PostState {
   reacted: Post | null;
   loading?: boolean;
   error: null;
+  hasMore: boolean;
 }
 
 const initialState: PostState = {
@@ -32,6 +23,7 @@ const initialState: PostState = {
   reacted: null,
   loading: false,
   error: null,
+  hasMore: true,
 };
 
 export const getPosts = createAsyncThunk("posts/fetchPosts", async () => {
@@ -66,6 +58,12 @@ export const addPost = createAsyncThunk(
     return response;
   }
 );
+
+export const deletePost = createAsyncThunk("posts/deletePostSlice", async (postId: string) => {
+  await deletePostAPI(postId);
+
+  return postId;
+});
 
 const postSlice = createSlice({
   name: "posts",
@@ -116,11 +114,6 @@ const postSlice = createSlice({
         if (index !== -1) {
           state.posts[index] = updatedPost;
         }
-        if (state.selectedPost?._id === updatedPost._id) {
-          state.selectedPost = updatedPost;
-        }
-
-        state.reacted = updatedPost;
       })
       .addCase(toggleReaction.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -138,6 +131,23 @@ const postSlice = createSlice({
         state.posts.unshift(action.payload.post);
       })
       .addCase(addPost.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* delete post */
+      .addCase(deletePost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.loading = false;
+        state.posts = state.posts.filter((post) => post._id !== action.payload);
+        if (state.selectedPost?._id === action.payload) {
+          state.selectedPost = null;
+        }
+      })
+      .addCase(deletePost.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });
