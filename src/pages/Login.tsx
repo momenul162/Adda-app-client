@@ -36,7 +36,10 @@ const Login = () => {
 
     if (formData.email && formData.password) {
       try {
-        const { data } = await axios.post("http://localhost:8080/auth/sign-in", formData);
+        const { data } = await axios.post(
+          "https://adda-app-server.onrender.com/auth/sign-in",
+          formData
+        );
 
         if (data.user.token) {
           localStorage.setItem("jwt-token", data.user.token);

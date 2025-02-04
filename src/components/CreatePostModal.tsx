@@ -19,7 +19,6 @@ import { useRef, useState } from "react";
 import { DialogClose } from "./ui/dialog";
 import uploadToCloudinary from "./updload-widget/UploadWidget";
 import { addPost } from "@/features/posts/postSlice";
-import { useNavigate } from "react-router-dom";
 import { ScrollArea } from "./ui/scroll-area";
 import { createPostSchema } from "@/model/schema";
 import { createPostValue } from "@/model/interface";
@@ -28,7 +27,6 @@ const CreatePostModal = () => {
   const [loading, setLoading] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { register, handleSubmit, setValue, watch } = useForm<createPostValue>({
     resolver: yupResolver(createPostSchema),
   });

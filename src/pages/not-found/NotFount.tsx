@@ -10,7 +10,7 @@ const NotFound = () => {
   };
 
   return (
-    <div className="container mx-auto max-h-screen">
+    <div className="container mx-auto max-h-screen mt-10">
       <Card className="flex flex-col items-center justify-center text-center p-6">
         <CardHeader className="text-4xl font-bold text-red-600">404</CardHeader>
         <CardDescription className="text-xl mt-4">

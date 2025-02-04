@@ -12,7 +12,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -40,7 +40,6 @@ interface PostCardProps {
 }
 
 const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
-  const [type, setType] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -105,7 +104,6 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
     }
 
     dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
-    setType(type);
   };
 
   // Check if user has already liked the post

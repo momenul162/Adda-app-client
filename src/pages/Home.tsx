@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 const Home = () => {
   const disPatch = useDispatch<AppDispatch>();
   const posts = useSelector((state: RootState) => state.posts.posts);
-  const loading = useSelector((state: RootState) => state.posts.loading);
+  // const loading = useSelector((state: RootState) => state.posts.loading);
 
   useEffect(() => {
     disPatch(fetchCurrentUser());

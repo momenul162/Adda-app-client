@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +57,10 @@ const Register = () => {
       };
 
       try {
-        const { data } = await axios.post("http://localhost:8080/auth/sign-up", user);
+        const { data } = await axios.post(
+          "https://adda-app-server.onrender.com/auth/sign-up",
+          user
+        );
 
         if (data) {
           setLoading(false);

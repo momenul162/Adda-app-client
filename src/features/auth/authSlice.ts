@@ -28,8 +28,11 @@ const authSlice = createSlice({
     login(state, action: PayloadAction<{ user: User; token: string }>) {
       (state.user = action.payload.user), (state.token = action.payload.token);
     },
-    logout(state) {
-      state = initialState;
+    logout(state: AuthState) {
+      state.user = null;
+      state.token = null;
+      state.loading = false;
+      state.error = null;
       localStorage.removeItem("jwt-token");
     },
   },

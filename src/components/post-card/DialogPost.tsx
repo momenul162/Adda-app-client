@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { deletePost, toggleReaction } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { Ellipsis, FilePenLine, Globe, Link2, Lock, Trash2, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -25,7 +25,6 @@ interface PostCardProps {
 }
 
 const DialogPost: React.FC<PostCardProps> = ({ post }) => {
-  const [type, setType] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const comments = useSelector((state: RootState) => state.comments.comments);
@@ -42,7 +41,6 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
     }
 
     dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
-    setType(type);
   };
 
   // Check if user has already liked the post
