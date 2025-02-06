@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +65,13 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     const video = videoRef.current;
     if (!video) return;
 
+    const savedVolume = localStorage.getItem("videoVolume");
+    if (savedVolume !== null) {
+      document.querySelectorAll("video").forEach((vid) => {
+        vid.volume = parseFloat(savedVolume);
+      });
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -76,6 +83,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
             // Play this video
             video.play();
+          } else {
+            video.pause();
           }
         });
       },
@@ -89,6 +98,16 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       observer.disconnect();
     };
   }, []);
+
+  const handleVolume = (e: React.ChangeEvent<HTMLVideoElement>) => {
+    const newVolume = e.target.volume;
+    localStorage.setItem("videoVolume", newVolume.toString());
+
+    // Apply the same volume to all videos
+    document.querySelectorAll("video").forEach((vid) => {
+      vid.volume = newVolume;
+    });
+  };
 
   /* handle post copy link */
   const handleCopyLink = () => {
@@ -200,6 +219,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <div className="mt-2 relative rounded-md">
               <video
                 ref={videoRef}
+                onVolumeChange={handleVolume}
                 src={post?.video}
                 className="w-full max-h-[500px] rounded-md"
                 controls

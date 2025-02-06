@@ -65,6 +65,13 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
     const video = videoRef.current;
     if (!video) return;
 
+    const savedVolume = localStorage.getItem("videoVolume");
+    if (savedVolume !== null) {
+      document.querySelectorAll("video").forEach((vid) => {
+        vid.volume = parseFloat(savedVolume);
+      });
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -76,6 +83,8 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
 
             // Play this video
             video.play();
+          } else {
+            video.pause();
           }
         });
       },
@@ -89,6 +98,16 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
       observer.disconnect();
     };
   }, []);
+
+  const handleVolume = (e: React.ChangeEvent<HTMLVideoElement>) => {
+    const newVolume = e.target.volume;
+    localStorage.setItem("videoVolume", newVolume.toString());
+
+    // Apply the same volume to all videos
+    document.querySelectorAll("video").forEach((vid) => {
+      vid.volume = newVolume;
+    });
+  };
 
   /* handle post copy link */
   const handleCopyLink = () => {
@@ -193,9 +212,9 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
           <video
             ref={videoRef}
             src={post?.video}
+            onVolumeChange={handleVolume}
             className="w-full max-h-[500px] rounded-md"
             controls
-            playsInline
           />
         </div>
       </CardContent>

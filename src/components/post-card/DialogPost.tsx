@@ -56,9 +56,9 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
             document.querySelectorAll("video").forEach((vid) => {
               if (vid !== video) vid.pause();
             });
-
-            // Play this video
             video.play();
+          } else {
+            video.pause();
           }
         });
       },

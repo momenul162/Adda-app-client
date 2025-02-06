@@ -1,10 +1,6 @@
 import PostCard from "@/components/post-card/PostCard";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  AvatarSkeletonFull,
-  AvatarSkeletonMid,
-  CoverSkeleton,
-} from "@/components/ui/skeleton/avatar-skeleton";
+import { AvatarSkeletonFull, CoverSkeleton } from "@/components/ui/skeleton/avatar-skeleton";
 import { PostCardSkeleton } from "@/components/ui/skeleton/post-card-skeleton";
 import { fetchCurrentUser } from "@/features/auth/authSlice";
 import { getPosts } from "@/features/posts/postSlice";
@@ -77,7 +73,7 @@ const UserProfile = () => {
           <div>About Section</div>
           <div>Friends list</div>
         </section>
-        <Card className="max-w-full">
+        <Card className="max-w-md">
           <p className="text-center my-2 text-2xl text-gray-700 font-bold">Your Timelines</p>
           <div>
             {loading && <PostCardSkeleton />}
