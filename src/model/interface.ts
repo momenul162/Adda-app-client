@@ -44,6 +44,10 @@ export interface User {
   country: string;
   photo: string;
   phone: string;
+  bio?: string;
+  friends: [];
+  friendRequests: [];
+  sentRequests: [];
 }
 
 export interface Comment {

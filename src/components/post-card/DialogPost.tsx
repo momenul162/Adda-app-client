@@ -105,7 +105,7 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
               className="rounded-full w-10 h-10 border hover:border-blue-500"
             />
             <div>
-              <Link to={"/profile"}>
+              <Link to={`/profile/${post.userId?.username}`}>
                 <h3 className="text-sm font-medium hover:underline hover:text-blue-800">
                   {post.userId?.username}
                 </h3>

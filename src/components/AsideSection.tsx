@@ -3,10 +3,11 @@ import { Separator } from "@/components/ui/separator";
 import { RootState } from "@/store";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { AvatarSkeletonMid, CoverSkeletonMid } from "./ui/skeleton/avatar-skeleton";
 
 const AsideSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
 
   const toggleExpand = () => {
     setIsExpanded((prev) => !prev);
@@ -20,17 +21,25 @@ const AsideSection = () => {
           <CardContent className="flex flex-col items-center text-center">
             <div className="relative w-full mb-10">
               {/* Background Banner */}
-              <img
-                src="https://cdn.pixabay.com/photo/2020/06/18/17/08/sunset-5314319_1280.jpg"
-                alt="Background"
-                className="w-full h-20 rounded-t-md object-cover"
-              />
+              {loading ? (
+                <CoverSkeletonMid />
+              ) : (
+                <img
+                  src="https://cdn.pixabay.com/photo/2020/06/18/17/08/sunset-5314319_1280.jpg"
+                  alt="Background"
+                  className="w-full h-24 rounded-t-md object-cover"
+                />
+              )}
               {/* Profile Picture */}
-              <img
-                src={user?.photo}
-                alt="Profile"
-                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-20 h-20 border-4 border-white rounded-full"
-              />
+              {loading ? (
+                <AvatarSkeletonMid />
+              ) : (
+                <img
+                  src={user?.photo}
+                  alt="Profile"
+                  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-20 h-20 border-4 border-white rounded-full"
+                />
+              )}
             </div>
             {/* User Details */}
             <h3 className="text-lg font-bold">{user?.username}</h3>

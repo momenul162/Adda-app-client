@@ -13,7 +13,7 @@ const Videos = () => {
     disPatch(getPosts());
   }, [disPatch]);
   return (
-    <div>
+    <div className="mx-auto">
       {loading && <PostCardSkeleton />}
       {posts && posts.map((post: any) => <VideoPlayer key={post?._id} post={post} />)}
     </div>

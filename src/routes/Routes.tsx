@@ -2,6 +2,7 @@ import MainLayout from "@/layout/Main";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found/NotFount";
+import UserProfile from "@/pages/Profile";
 import Register from "@/pages/Register";
 import Post from "@/pages/searched-post";
 import Videos from "@/pages/Videos";
@@ -15,6 +16,7 @@ const UserRoutes = () => {
           <Route path="*" element={<NotFound />} />
           <Route path="/" element={<Home />} />
           <Route path="/videos" element={<Videos />} />
+          <Route path="/profile/:username" element={<UserProfile />} />
           <Route path="/posts/:postId" element={<Post />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

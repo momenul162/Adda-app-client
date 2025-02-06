@@ -129,7 +129,7 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
   if (!post?.video) return null; // Hide the post if no video
 
   return (
-    <Card className="my-8 md:my-4 w-full shadow-lg max-w-4xl mx-auto border">
+    <Card className="my-8 md:my-4 w-full shadow-lg mx-auto max-w-4xl border">
       {/* ... (rest of the component remains the same) */}
       <CardHeader className="justify-between">
         {/* Placeholder for Author Avatar (replace with actual image) */}
@@ -141,7 +141,7 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
             className="rounded-full w-10 h-10 border hover:border-blue-500"
           />
           <div>
-            <Link to={"/profile"}>
+            <Link to={`/profile/${post.userId?.username}`}>
               <h3 className="text-sm font-medium hover:underline hover:text-blue-800">
                 {post.userId?.username}
               </h3>

@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const PostCardSkeleton = () => {
   return (
-    <>
+    <div className="container mx-auto">
       {[...Array(2)].map((_, index) => (
         <Card key={index} className="my-4 px-auto shadow-lg max-w-2xl border bg-gray-200">
           <CardHeader className="flex justify-between items-center p-4">
@@ -30,6 +30,6 @@ export const PostCardSkeleton = () => {
           </CardFooter>
         </Card>
       ))}
-    </>
+    </div>
   );
 };

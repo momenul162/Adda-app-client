@@ -6,20 +6,25 @@ import CreatePostModal from "./CreatePostModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { AvatarSkeleton } from "./ui/skeleton/avatar-skeleton";
 
 const PostInputBox = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
 
   return (
     <div className="shadow-lg mx-auto bg-white p-4 mt-4">
       {/* Input Section */}
       <div className="flex items-center space-x-3 mb-4">
         {/* Profile Picture */}
-        <img
-          src={user?.photo}
-          alt="Profile"
-          className="rounded-full w-11 h-11 border hover:border-blue-500"
-        />
+        {loading ? (
+          <AvatarSkeleton />
+        ) : (
+          <img
+            src={user?.photo}
+            alt="Profile"
+            className="rounded-full w-11 h-11 border hover:border-blue-500"
+          />
+        )}
         {/* Input */}
 
         <Dialog>

@@ -16,9 +16,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { RootState } from "@/store";
 import { Button } from "@/components/ui/button";
+import { AvatarSkeleton } from "@/components/ui/skeleton/avatar-skeleton";
 
 const Navbar = () => {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -78,7 +79,7 @@ const Navbar = () => {
             />
           </NavLink>
           <NavLink
-            to={"/profile"}
+            to={`/profile/${user?.username}`}
             className={({ isActive }) =>
               `${isActive ? "rounded-lg shadow-lg shadow-[#94acea]" : ""}`
             }
@@ -90,12 +91,6 @@ const Navbar = () => {
               hover={"Profile"}
             />
           </NavLink>
-          {/* <a
-            href="/contact"
-            className="block px-4 py-2 text-gray-700 hover:text-blue-600 md:inline-block"
-          >
-            Contact
-          </a> */}
         </div>
 
         {/* Search */}
@@ -115,14 +110,18 @@ const Navbar = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar>
-                  <img
-                    src={user?.photo}
-                    alt="Post Image"
-                    style={{ objectFit: "cover" }}
-                    className="rounded-full w-11 h-11 border hover:border-blue-500"
-                  />
-                </Avatar>
+                {loading ? (
+                  <AvatarSkeleton />
+                ) : (
+                  <Avatar>
+                    <img
+                      src={user?.photo}
+                      alt="Post Image"
+                      style={{ objectFit: "cover" }}
+                      className="rounded-full w-11 h-11 border hover:border-blue-500"
+                    />
+                  </Avatar>
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-30 bg-white">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
