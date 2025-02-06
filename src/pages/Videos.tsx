@@ -1,11 +1,22 @@
 import VideoPlayer from "@/components/post-card/videoPlayer";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { PostCardSkeleton } from "@/components/ui/skeleton/post-card-skeleton";
+import { getPosts } from "@/features/posts/postSlice";
+import { AppDispatch, RootState } from "@/store";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Videos = () => {
-  const posts = useSelector((state: RootState) => state.posts.posts);
+  const disPatch = useDispatch<AppDispatch>();
+  const { posts, loading } = useSelector((state: RootState) => state.posts);
+
+  useEffect(() => {
+    disPatch(getPosts());
+  }, [disPatch]);
   return (
-    <div>{posts && posts.map((post: any) => <VideoPlayer key={post?._id} post={post} />)}</div>
+    <div>
+      {loading && <PostCardSkeleton />}
+      {posts && posts.map((post: any) => <VideoPlayer key={post?._id} post={post} />)}
+    </div>
   );
 };
 

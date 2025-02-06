@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { deletePost, toggleReaction } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { Ellipsis, FilePenLine, Globe, Link2, Lock, Trash2, Users } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
@@ -28,6 +28,7 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const comments = useSelector((state: RootState) => state.comments.comments);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   /* get comments */
   useEffect(() => {
@@ -42,6 +43,35 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
 
     dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
   };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Pause all other videos before playing the current one
+            document.querySelectorAll("video").forEach((vid) => {
+              if (vid !== video) vid.pause();
+            });
+
+            // Play this video
+            video.play();
+          }
+        });
+      },
+      { threshold: 0.5 } // Trigger when at least 50% visible
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.unobserve(video);
+      observer.disconnect();
+    };
+  }, []);
 
   // Check if user has already liked the post
   const hasLiked = post.likes?.includes(user?._id);
@@ -127,13 +157,18 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
               <img
                 src={post?.image}
                 alt="Post image"
-                className="rounded-md max-h-full min-w-full object-cover"
+                className="w-full object-cover max-h-[600px] rounded-md"
               />
             </div>
           )}
           {post?.video && (
-            <div className="mt-2 relative aspect-video overflow-hidden rounded-md">
-              <video src={post?.video} className="w-full h-full rounded-md" controls />
+            <div className="mt-2 relative rounded-md">
+              <video
+                src={post?.video}
+                className="w-full max-h-[600px] rounded-md"
+                controls
+                ref={videoRef}
+              />
             </div>
           )}
         </CardContent>

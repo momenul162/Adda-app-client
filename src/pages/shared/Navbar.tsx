@@ -51,7 +51,9 @@ const Navbar = () => {
         <div className={`bg-white flex items-center gap-1 sm:gap-2 md:gap-4`}>
           <NavLink
             to={"/"}
-            className={({ isActive }) => `${isActive ? "bg-[#bccaec] rounded-md" : ""}`}
+            className={({ isActive }) =>
+              `${isActive ? "rounded-lg shadow-lg shadow-[#94acea]" : ""}`
+            }
             onClick={handleRefresh}
           >
             <TooltipComp
@@ -63,7 +65,9 @@ const Navbar = () => {
           </NavLink>
           <NavLink
             to={"/videos"}
-            className={({ isActive }) => `${isActive ? "bg-[#bccaec] rounded-full" : ""}`}
+            className={({ isActive }) =>
+              `${isActive ? " rounded-lg shadow-lg shadow-[#94acea]" : ""}`
+            }
             onClick={handleRefresh}
           >
             <TooltipComp
@@ -75,7 +79,9 @@ const Navbar = () => {
           </NavLink>
           <NavLink
             to={"/profile"}
-            className={({ isActive }) => `${isActive ? "bg-[#bccaec] rounded-full" : ""}`}
+            className={({ isActive }) =>
+              `${isActive ? "rounded-lg shadow-lg shadow-[#94acea]" : ""}`
+            }
           >
             <TooltipComp
               variant={"outline"}

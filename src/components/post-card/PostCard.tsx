@@ -62,29 +62,31 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (videoRef.current) {
-            if (entry.isIntersecting) {
-              videoRef.current.play();
-            } else {
-              videoRef.current.pause();
-            }
+          if (entry.isIntersecting) {
+            // Pause all other videos before playing the current one
+            document.querySelectorAll("video").forEach((vid) => {
+              if (vid !== video) vid.pause();
+            });
+
+            // Play this video
+            video.play();
           }
         });
       },
-      { threshold: 1 } // Play video when 100% visible
+      { threshold: 0.5 } // Trigger when at least 50% visible
     );
 
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
-    }
+    observer.observe(video);
 
     return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
-      }
+      observer.unobserve(video);
+      observer.disconnect();
     };
   }, []);
 
@@ -125,7 +127,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const formattedDate = getTimeCompare(date);
 
   return (
-    <Card className="my-4 w-full shadow-lg max-w-2xl mx-auto border">
+    <Card className="my-4 w-full shadow-lg max-w-4xl mx-auto border">
       {/* ... (rest of the component remains the same) */}
       <CardHeader className="justify-between">
         {/* Placeholder for Author Avatar (replace with actual image) */}
@@ -189,13 +191,18 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <img
               src={post?.image}
               alt="Post image"
-              className="rounded-md object-cover w-full max-h-full"
+              className="w-full object-cover max-h-[500px] rounded-md"
             />
           </div>
         )}
         {post?.video && (
-          <div className="mt-2 relative aspect-video overflow-hidden rounded-md">
-            <video ref={videoRef} src={post?.video} className="w-full h-full rounded-md" controls />
+          <div className="mt-2 relative rounded-md">
+            <video
+              ref={videoRef}
+              src={post?.video}
+              className="w-full max-h-[500px] rounded-md"
+              controls
+            />
           </div>
         )}
       </CardContent>
