@@ -6,10 +6,10 @@ import CreatePostModal from "./CreatePostModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { AvatarSkeleton } from "./ui/skeleton/avatar-skeleton";
+import { AvatarSkeleton } from "./skeleton/avatar-skeleton";
 
 const PostInputBox = () => {
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { currentUser, loading } = useSelector((state: RootState) => state.auth);
 
   return (
     <div className="shadow-lg mx-auto bg-white p-4 mt-4">
@@ -20,7 +20,7 @@ const PostInputBox = () => {
           <AvatarSkeleton />
         ) : (
           <img
-            src={user?.photo}
+            src={currentUser?.photo}
             alt="Profile"
             className="rounded-full w-11 h-11 border hover:border-blue-500"
           />
@@ -32,7 +32,7 @@ const PostInputBox = () => {
             <Input
               id="post"
               type="text"
-              placeholder={`What's on your mind, ${user?.username}.`}
+              placeholder={`What's on your mind, ${currentUser?.username}.`}
               className="rounded-full"
             />
           </DialogTrigger>

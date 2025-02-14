@@ -41,9 +41,11 @@ const Login = () => {
           formData
         );
 
-        if (data.user.token) {
-          localStorage.setItem("jwt-token", data.user.token);
-          dispatch(login({ user: data.user.user, token: data.user.token }));
+        console.log(data);
+
+        if (data.token) {
+          localStorage.setItem("jwt-token", data.token);
+          dispatch(login({ user: data.user, token: data.token }));
           setLoading(false);
           reset();
           navigate(from, { replace: true });

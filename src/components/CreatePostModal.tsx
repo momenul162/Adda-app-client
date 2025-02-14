@@ -25,7 +25,7 @@ import { createPostValue } from "@/model/interface";
 
 const CreatePostModal = () => {
   const [loading, setLoading] = useState(false);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { currentUser } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const { register, handleSubmit, setValue, watch } = useForm<createPostValue>({
     resolver: yupResolver(createPostSchema),
@@ -41,7 +41,7 @@ const CreatePostModal = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const onSubmit = async (data: createPostValue) => {
-    if (!user?._id) {
+    if (!currentUser?._id) {
       console.error("User ID is missing");
       return;
     }
@@ -60,7 +60,7 @@ const CreatePostModal = () => {
     }
 
     const payload = {
-      userId: user._id,
+      userId: currentUser._id,
       visibility: data.visibility,
       body: data.body,
       image: imageUrl || null,
@@ -90,10 +90,10 @@ const CreatePostModal = () => {
             <div className="p-4">
               <div className="flex items-center space-x-3 mb-4">
                 <Avatar>
-                  <AvatarImage src={user?.photo} />
+                  <AvatarImage src={currentUser?.photo} />
                 </Avatar>
                 <div>
-                  <p className="font-semibold">{user?.username}</p>
+                  <p className="font-semibold">{currentUser?.username}</p>
                   <Select
                     value={watch("visibility") || "PUBLIC"}
                     onValueChange={(value) =>
@@ -115,7 +115,7 @@ const CreatePostModal = () => {
               </div>
 
               <Textarea
-                placeholder={`What's on your mind, ${user?.username}?`}
+                placeholder={`What's on your mind, ${currentUser?.username}?`}
                 {...register("body")}
               />
 

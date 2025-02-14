@@ -2,7 +2,7 @@ import DialogPost from "@/components/post-card/DialogPost";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchCurrentUser } from "@/features/auth/authSlice";
+import { fetchCurrentUser } from "@/features/auth/authAPI";
 import { getPostById } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { ArrowLeft, SendHorizontal } from "lucide-react";

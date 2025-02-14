@@ -3,11 +3,11 @@ import { Separator } from "@/components/ui/separator";
 import { RootState } from "@/store";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { AvatarSkeletonMid, CoverSkeletonMid } from "./ui/skeleton/avatar-skeleton";
+import { AvatarSkeletonMid, CoverSkeletonMid } from "./skeleton/avatar-skeleton";
 
 const AsideSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { currentUser, loading } = useSelector((state: RootState) => state.auth);
 
   const toggleExpand = () => {
     setIsExpanded((prev) => !prev);
@@ -35,14 +35,14 @@ const AsideSection = () => {
                 <AvatarSkeletonMid />
               ) : (
                 <img
-                  src={user?.photo}
+                  src={currentUser?.photo}
                   alt="Profile"
                   className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-20 h-20 border-4 border-white rounded-full"
                 />
               )}
             </div>
             {/* User Details */}
-            <h3 className="text-lg font-bold">{user?.username}</h3>
+            <h3 className="text-lg font-bold">{currentUser?.username}</h3>
             <p className="text-sm text-gray-500 my-2">
               Front-end Developer | JavaScript | React | Student at University of Rajshahi
             </p>

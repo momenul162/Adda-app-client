@@ -1,8 +1,8 @@
 import AsideSection from "@/components/AsideSection";
 import PostCard from "@/components/post-card/PostCard";
 import PostInputBox from "@/components/PostInputBox";
-import { PostCardSkeleton } from "@/components/ui/skeleton/post-card-skeleton";
-import { fetchCurrentUser } from "@/features/auth/authSlice";
+import { PostCardSkeleton } from "@/components/skeleton/post-card-skeleton";
+import { fetchCurrentUser } from "@/features/auth/authAPI";
 import { getPosts } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { useEffect } from "react";
@@ -19,7 +19,7 @@ const Home = () => {
 
   return (
     <div className="container mx-auto lg:flex justify-center lg:justify-around gap-52 2xl:gap-4">
-      <section className="lg:max-w-xs 2xl:max-w-sm">
+      <section className="md:hidden lg:max-w-xs 2xl:max-w-sm">
         <AsideSection />
       </section>
       <section className="max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-md 2xl:max-w-2xl">

@@ -1,4 +1,4 @@
-import { Skeleton } from "../skeleton";
+import { Skeleton } from "../ui/skeleton";
 
 export const AvatarSkeletonFull = () => {
   return <Skeleton className="w-32 h-32 rounded-full bg-gray-300" />;

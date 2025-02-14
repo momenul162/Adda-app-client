@@ -16,10 +16,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { RootState } from "@/store";
 import { Button } from "@/components/ui/button";
-import { AvatarSkeleton } from "@/components/ui/skeleton/avatar-skeleton";
+import { AvatarSkeleton } from "@/components/skeleton/avatar-skeleton";
 
 const Navbar = () => {
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const { currentUser, loading } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -79,7 +79,7 @@ const Navbar = () => {
             />
           </NavLink>
           <NavLink
-            to={`/profile/${user?.username}`}
+            to={`/profile/${currentUser?._id}`}
             className={({ isActive }) =>
               `${isActive ? "rounded-lg shadow-lg shadow-[#94acea]" : ""}`
             }
@@ -100,14 +100,17 @@ const Navbar = () => {
         </div>
 
         {/* Right Section: Search, Notifications, Profile */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           {/* Notifications */}
           {/* <Button variant="ghost" size="icon">
             <Bell strokeWidth={3} size={48} color="#255ad4" />
           </Button> */}
+          <p className="hidden lg:block italic text-gray-700 font-semibold">
+            {currentUser?.username}
+          </p>
 
           {/* Profile */}
-          {user ? (
+          {currentUser ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 {loading ? (
@@ -115,7 +118,7 @@ const Navbar = () => {
                 ) : (
                   <Avatar>
                     <img
-                      src={user?.photo}
+                      src={currentUser?.photo}
                       alt="Post Image"
                       style={{ objectFit: "cover" }}
                       className="rounded-full w-11 h-11 border hover:border-blue-500"
@@ -127,9 +130,11 @@ const Navbar = () => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <User /> Profile
-                  </DropdownMenuItem>
+                  <Link to={`/profile/${currentUser._id}`}>
+                    <DropdownMenuItem className="hover:underline hover:text-blue-600">
+                      <User /> Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem>
                     <Settings /> Settings
                   </DropdownMenuItem>

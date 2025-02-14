@@ -36,6 +36,12 @@ export interface createPostValue {
   video?: FileList | null;
 }
 
+export interface FriendType {
+  _id: string;
+  username: string;
+  photo: string;
+  email: string;
+}
 export interface User {
   _id?: string;
   username: string;
@@ -45,9 +51,12 @@ export interface User {
   photo: string;
   phone: string;
   bio?: string;
-  friends: [];
-  friendRequests: [];
-  sentRequests: [];
+  occupation: string;
+  dateOfBirth: string;
+  currentCity: string;
+  friends: FriendType[];
+  friendRequests: FriendType[];
+  sentRequests: FriendType[];
 }
 
 export interface Comment {

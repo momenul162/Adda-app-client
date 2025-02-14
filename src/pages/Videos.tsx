@@ -1,5 +1,5 @@
 import VideoPlayer from "@/components/post-card/videoPlayer";
-import { PostCardSkeleton } from "@/components/ui/skeleton/post-card-skeleton";
+import { PostCardSkeleton } from "@/components/skeleton/post-card-skeleton";
 import { getPosts } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { useEffect } from "react";
