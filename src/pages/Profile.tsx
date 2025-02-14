@@ -47,6 +47,7 @@ const UserProfile = () => {
     "https://cdn.pixabay.com/photo/2020/06/18/17/08/sunset-5314319_1280.jpg"
   );
   const [profilePhoto, setProfilePhoto] = useState(currentUser?.photo);
+  console.log(profilePhoto);
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
