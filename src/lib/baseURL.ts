@@ -5,7 +5,7 @@ const API_URL = "https://adda-app-server.onrender.com";
 // Create an axios instance
 const baseURL = axios.create({
   baseURL: API_URL,
-  timeout: 5000, // Request timeout in milliseconds
+  timeout: 5000,
 });
 
 // Add a request interceptor to attach the JWT token
@@ -29,8 +29,8 @@ baseURL.interceptors.response.use(
     if (error.response?.status === 401) {
       //TODO: use alert..
       console.log("Token is invalid or expired. Please login again.");
-      localStorage.removeItem("token"); // Clear the token
-      window.location.href = "/login"; // Redirect to the login page
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

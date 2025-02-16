@@ -226,7 +226,7 @@ const UserProfile = () => {
                           <X /> Reject
                         </Button>
                       </>
-                    ) : hasSentRequest ? (
+                    ) : hasSentRequest && user ? (
                       <Button
                         variant="outline"
                         className="bg-blue-500 text-white hover:text-red-500 hover:shadow-[#94acea]"
