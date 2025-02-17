@@ -1,18 +1,13 @@
 import PostCard from "@/components/post-card/PostCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PostCardSkeleton } from "@/components/skeleton/post-card-skeleton";
 import {
   acceptRequest,
   fetchCurrentUser,
   getUserById,
   sendFriendRequest,
+  updateUserProfile,
 } from "@/features/auth/authAPI";
 import { getPosts } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
@@ -22,7 +17,9 @@ import {
   Ellipsis,
   EllipsisVertical,
   ImageUp,
+  Mail,
   MapPinCheckInside,
+  Phone,
   School,
   UserCheck,
   UserPlus,
@@ -32,22 +29,34 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import FriendSection from "@/components/Profile-friend-section/FriendSection";
+import AboutRow from "@/components/about/AboutRow";
+import { AvatarSkeletonFull, CoverSkeleton } from "@/components/skeleton/avatar-skeleton";
+import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import UpdateBio from "@/components/Bio/UpdateBio";
+import UpdateAbout from "@/components/about/UpdateAbout";
+import uploadToCloudinary from "@/components/upload-widget/uploadForPost";
 
 const UserProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, loading } = useSelector((state: RootState) => state.posts);
-  const { currentUser, user } = useSelector((state: RootState) => state.auth);
+  const { currentUser, user, loading: isLoading } = useSelector((state: RootState) => state.auth);
   const { userId } = useParams();
 
   // Ensure `paramsUser` is declared before usage
-  const filteredPost = posts.filter((post) => post.userId?._id === userId);
+  const filteredPost = posts
+    .filter((post) => post.userId?._id === userId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // State for cover & profile photos
-  const [coverPhoto, setCoverPhoto] = useState(
-    "https://cdn.pixabay.com/photo/2020/06/18/17/08/sunset-5314319_1280.jpg"
-  );
+  const [coverPhoto, setCoverPhoto] = useState(currentUser?.coverPhoto);
   const [profilePhoto, setProfilePhoto] = useState(currentUser?.photo);
-  console.log(profilePhoto);
+  useEffect(() => {
+    if (currentUser) {
+      setCoverPhoto(currentUser.coverPhoto);
+      setProfilePhoto(currentUser.photo);
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
@@ -103,42 +112,31 @@ const UserProfile = () => {
   // Handle file selection and preview
   const handleCoverChange = async (event: any) => {
     const file = event.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setCoverPhoto(url);
-      await handleUpload(file, "cover"); // Upload to server
-    }
+    const url = await uploadToCloudinary(file, "image");
+    setCoverPhoto(url);
+    dispatch(updateUserProfile({ coverPhoto: url }))
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: "Cover photo updated successfully",
+        });
+      });
   };
 
   const handleProfileChange = async (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setProfilePhoto(url);
-      await handleUpload(file, "profile"); // Upload to server
-    }
-  };
-
-  // Function to handle image upload (Modify API endpoint)
-  const handleUpload = async (file: string, type: string) => {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const response = await fetch(`/api/upload/${type}`, {
-        method: "POST",
-        body: formData,
+    const imageFile = event.target.files[0];
+    const url = await uploadToCloudinary(imageFile, "image");
+    console.log(url);
+    setProfilePhoto(url);
+    dispatch(updateUserProfile({ photo: url }))
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: "Profile photo updated successfully",
+        });
       });
-      const data = await response.json();
-
-      if (response.ok) {
-        type === "cover" ? setCoverPhoto(data.imageUrl) : setProfilePhoto(data.imageUrl);
-      } else {
-        console.error("Upload failed:", data.message);
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
   };
 
   return (
@@ -147,7 +145,20 @@ const UserProfile = () => {
       <Card className="mb-4 rounded-none shadow-sm border">
         <CardContent>
           <div className="relative h-48 w-full">
-            <img src={coverPhoto} alt="Cover" className="w-full h-40 rounded-t-md object-cover" />
+            {isLoading && !coverPhoto && <CoverSkeleton />}
+            {currentUser?._id === userId ? (
+              <img
+                src={coverPhoto}
+                alt="Upload your cover photo"
+                className="w-full h-40 rounded-t-md border object-cover"
+              />
+            ) : (
+              <img
+                src={user?.coverPhoto}
+                alt="Not upload cover photo yet"
+                className="w-full h-40 rounded-t-md border object-cover"
+              />
+            )}
             {currentUser?._id === userId && (
               <div className="absolute bottom-10 right-2">
                 <input
@@ -166,9 +177,10 @@ const UserProfile = () => {
 
           {/* Profile Photo */}
           <div className="relative w-32 h-32 -mt-16 mx-auto">
+            {isLoading && !profilePhoto && <AvatarSkeletonFull />}
             {currentUser?._id === userId ? (
               <img
-                src={currentUser?.photo}
+                src={profilePhoto}
                 alt="Profile"
                 className="w-32 h-32 border-2 border-[#94acea] rounded-full object-cover"
               />
@@ -249,10 +261,26 @@ const UserProfile = () => {
               </div>
 
               <p className="text-sm text-gray-500 my-2">
-                Front-end Developer | JavaScript | React | Student at University of Rajshahi
+                {currentUser?._id === userId
+                  ? currentUser?.bio || "{ Update Your Bio }"
+                  : user?.bio || "{ Empty Bio }"}
               </p>
             </div>
-            {currentUser?._id === userId ? <Edit /> : <EllipsisVertical />}
+            {currentUser?._id === userId ? (
+              <Dialog>
+                <DialogTrigger>
+                  <Edit />
+                </DialogTrigger>
+                <DialogContent className="bg-slate-300">
+                  <DialogTitle>Update Name & Bio</DialogTitle>
+                  <UpdateBio currentUser={currentUser} />
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <div>
+                <EllipsisVertical />
+              </div>
+            )}
           </div>
         </CardContent>
         <CardFooter className="block md:hidden">
@@ -267,34 +295,65 @@ const UserProfile = () => {
           <Card className="w-[350px] py-4 mb-2">
             <CardHeader className="flex items-center justify-between">
               <CardTitle>About</CardTitle>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  {currentUser?._id === userId && <Ellipsis />}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-10 bg-white">
-                  <DropdownMenuItem>Edit About</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {currentUser?._id === userId && (
+                <Dialog>
+                  <DialogTrigger>
+                    <Ellipsis />
+                  </DialogTrigger>
+                  <DialogContent className="bg-slate-300">
+                    <DialogTitle>Update Name & Bio</DialogTitle>
+                    <UpdateAbout />
+                  </DialogContent>
+                </Dialog>
+              )}
             </CardHeader>
             <CardContent className="p-3 flex flex-col gap-y-4">
-              <div className="flex items-center justify-between">
-                <p className="flex items-center gap-1 text-sm font-medium">
-                  <MapPinCheckInside size={16} color="#3c538f" /> Current City:
-                </p>
-                <p className="text-sm text-gray-600">Rajshahi</p>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="flex items-center gap-1 text-sm font-medium">
-                  <Cake size={16} color="#3c538f" /> Date of Birth:
-                </p>
-                <p className="text-sm text-gray-600">12 Nov 2001</p>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="flex items-center gap-1 text-sm font-medium">
-                  <School size={16} color="#3c538f" /> Occupation:
-                </p>
-                <p className="text-sm text-gray-600">Student</p>
-              </div>
+              <AboutRow
+                icon={<MapPinCheckInside size={16} color="#3c538f" />}
+                propertyName="Current City"
+                value={
+                  currentUser?._id === userId
+                    ? currentUser?.currentCity || "..."
+                    : user?.currentCity || "..."
+                }
+              />
+              <AboutRow
+                icon={<Cake size={16} color="#3c538f" />}
+                propertyName="Date of Birth"
+                value={
+                  currentUser?._id === userId
+                    ? currentUser?.dateOfBirth
+                      ? new Date(currentUser?.dateOfBirth).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "././."
+                    : user?.dateOfBirth
+                    ? new Date(user?.dateOfBirth).toLocaleDateString()
+                    : "././."
+                }
+              />
+
+              <AboutRow
+                icon={<School size={16} color="#3c538f" />}
+                propertyName="Occupation"
+                value={
+                  currentUser?._id === userId
+                    ? currentUser?.occupation || "..."
+                    : user?.occupation || "..."
+                }
+              />
+              <AboutRow
+                icon={<Mail size={16} color="#3c538f" />}
+                propertyName="Email"
+                value={currentUser?._id === userId ? currentUser?.email || "" : user?.email || ""}
+              />
+              <AboutRow
+                icon={<Phone size={16} color="#3c538f" />}
+                propertyName="Mobile"
+                value={currentUser?._id === userId ? currentUser?.phone || "" : user?.phone || ""}
+              />
             </CardContent>
           </Card>
 

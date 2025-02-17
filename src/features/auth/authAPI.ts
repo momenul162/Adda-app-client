@@ -1,15 +1,32 @@
 import baseURL from "@/lib/baseURL";
+import { updateUser } from "@/model/interface";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const fetchCurrentUser = createAsyncThunk("user/fetchCurrentUser", async () => {
-  const { data } = await baseURL.get(`/auth/current-user`);
-  return data;
+export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async () => {
+  try {
+    const { data } = await baseURL.get(`/auth/current-user`);
+    return data;
+  } catch (error: any) {
+    return error.response?.data || "Friend request failed";
+  }
 });
 
-export const getUserById = createAsyncThunk("users/fetchUserById", async (userId: string) => {
+export const getUserById = createAsyncThunk("auth/fetchUserById", async (userId: string) => {
   const { data } = await baseURL.get(`/auth/users/${userId}`);
   return data;
 });
+
+export const updateUserProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (updatedData: updateUser, { rejectWithValue }) => {
+    try {
+      const response = await baseURL.patch(`/auth/users/me`, updatedData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "User update request failed");
+    }
+  }
+);
 
 export const sendFriendRequest = createAsyncThunk(
   "auth/friendRequest",

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader } from "../ui/card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { FriendType } from "@/model/interface";
@@ -19,6 +19,10 @@ const FriendSection = ({
   const [listName, setListName] = useState<string>("friends");
   const [showList, setShowList] = useState<FriendType[]>([]);
   const { currentUser, user } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    handleShowFriend("friends");
+  }, []);
 
   const handleShowFriend = (value: string) => {
     setListName(value);

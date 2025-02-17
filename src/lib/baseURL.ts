@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://adda-app-server.onrender.com";
+const API_URL = "http://localhost:8080";
 
 // Create an axios instance
 const baseURL = axios.create({

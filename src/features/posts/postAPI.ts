@@ -1,4 +1,6 @@
 import baseURL from "@/lib/baseURL";
+import { createPostValue, postValueInterface } from "@/model/interface";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Fetch all posts
 export const fetchPost = async () => {
@@ -19,11 +21,25 @@ export const fetchPostById = async (postId: string) => {
 };
 
 /* Add new post api */
-export const addNewPostAPI = async (newPost: {}) => {
-  console.log(newPost);
+export const addNewPostAPI = async (newPost: postValueInterface) => {
   const response = await baseURL.post("/posts", newPost);
   return response.data;
 };
+
+export const updatePost = createAsyncThunk(
+  "posts/updatePost",
+  async (
+    { postId, updatedData }: { postId: string; updatedData: createPostValue },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await baseURL.patch(`/posts/${postId}`, updatedData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Post update request failed");
+    }
+  }
+);
 
 export const toggleReactionAPI = async (postId: string, userId: string, type: string) => {
   try {

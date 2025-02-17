@@ -1,5 +1,4 @@
 import { FileVideo, ImageUp, Loader2 } from "lucide-react";
-import { TooltipComp } from "./Tooltip";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import {
@@ -15,62 +14,65 @@ import { useForm } from "react-hook-form";
 import { AppDispatch, RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRef, useState } from "react";
 import { DialogClose } from "./ui/dialog";
-import { addPost } from "@/features/posts/postSlice";
 import { ScrollArea } from "./ui/scroll-area";
 import { createPostSchema } from "@/model/schema";
-import { createPostValue } from "@/model/interface";
+import { createPostValue, Post } from "@/model/interface";
+import { useState } from "react";
+import { updatePost } from "@/features/posts/postAPI";
 import uploadToCloudinary from "./upload-widget/uploadForPost";
+import { Separator } from "./ui/separator";
 
-const CreatePostModal = () => {
+interface updateProps {
+  post: Post;
+}
+
+const UpdatePostModal = ({ post }: updateProps) => {
   const [loading, setLoading] = useState(false);
   const { currentUser } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
-  const { register, handleSubmit, setValue, watch } = useForm<createPostValue>({
+
+  // Use defaultValues for the form fields
+  const { register, handleSubmit, setValue, watch } = useForm({
     resolver: yupResolver(createPostSchema),
+    defaultValues: {
+      body: post.body || "",
+      visibility: post.visibility || "PUBLIC",
+    },
   });
 
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
-
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  // Initialize state for file previews (image/video)
+  const [selectedImage, setSelectedImage] = useState<string | null>(post.image || "");
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(post.video || "");
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
   const onSubmit = async (data: createPostValue) => {
-    if (!currentUser?._id) {
-      console.error("User ID is missing");
-      return;
-    }
+    if (!currentUser?._id || !post._id) return console.error("User or Post ID is missing");
 
-    let imageUrl: string | null = null;
-    let videoUrl: string | null = null;
+    console.log(data);
 
     setLoading(true);
+    try {
+      let imageUrl = imageFile ? await uploadToCloudinary(imageFile, "image") : post.image;
+      let videoUrl = videoFile ? await uploadToCloudinary(videoFile, "video") : post.video;
 
-    if (imageFile) {
-      imageUrl = await uploadToCloudinary(imageFile, "image");
-    }
+      const updatedData = {
+        visibility: data.visibility,
+        body: data.body,
+        image: imageUrl,
+        video: videoUrl,
+      };
 
-    if (videoFile) {
-      videoUrl = await uploadToCloudinary(videoFile, "video");
-    }
-
-    const payload = {
-      userId: currentUser._id,
-      visibility: data.visibility,
-      body: data.body,
-      image: imageUrl || null,
-      video: videoUrl || null,
-    };
-
-    dispatch(addPost(payload)).then(() => {
+      await dispatch(updatePost({ updatedData, postId: post._id }));
       setLoading(false);
-      alert("Post uploaded successfully");
-    });
+      alert("Post updated successfully");
+    } catch (error) {
+      setLoading(false);
+      console.error("Error updating post", error);
+      alert("An error occurred while updating the post.");
+    }
   };
 
   return (
@@ -79,14 +81,13 @@ const CreatePostModal = () => {
         <div className="bg-white rounded-lg w-full max-w-lg shadow-md">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-between items-center px-4 py-3 border-b">
-              <h2 className="text-lg font-semibold">Create post</h2>
+              <h2 className="text-lg font-semibold">Update post</h2>
               <DialogClose asChild>
                 <button className="text-gray-500 text-xl font-extrabold hover:text-red-600">
                   &times;
                 </button>
               </DialogClose>
             </div>
-
             <div className="p-4">
               <div className="flex items-center space-x-3 mb-4">
                 <Avatar>
@@ -118,70 +119,43 @@ const CreatePostModal = () => {
                 placeholder={`What's on your mind, ${currentUser?.username}?`}
                 {...register("body")}
               />
+              <Separator />
 
-              <div className="flex items-center space-x-3 mt-10 mb-4">
-                <Button variant="ghost">Add to your post</Button>
-                <div className="flex items-center">
-                  <TooltipComp
-                    variant="outline"
-                    style="text-blue-500 border-none"
-                    button={
-                      <div
-                        onClick={(e) => {
-                          e.preventDefault();
-                          imageInputRef.current?.click();
-                        }}
-                      >
-                        <ImageUp size={24} />
-                      </div>
+              <div className="absolute bottom-14 left-10">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  id="imageUpload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImageFile(file);
+                      setSelectedImage(URL.createObjectURL(file));
                     }
-                    hover="Image"
-                  />
-                  <input
-                    ref={imageInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={async (e) => {
-                      const files = e.target.files;
-                      if (files && files.length > 0) {
-                        setImageFile(files[0]);
-                        setSelectedImage(URL.createObjectURL(files[0]));
-                      }
-                    }}
-                  />
-
-                  <TooltipComp
-                    variant="outline"
-                    style="text-green-500 border-none"
-                    button={
-                      <div
-                        onClick={(e) => {
-                          e.preventDefault();
-                          videoInputRef.current?.click();
-                        }}
-                      >
-                        <FileVideo size={24} />
-                      </div>
+                  }}
+                />
+                <label htmlFor="imageUpload">
+                  <ImageUp size={25} color="#3c538f" />
+                </label>
+              </div>
+              <div className="absolute bottom-14 left-20">
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  id="videoUpload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setVideoFile(file);
+                      setSelectedVideo(URL.createObjectURL(file));
                     }
-                    hover="Video"
-                  />
-                  <input
-                    ref={videoInputRef}
-                    type="file"
-                    accept="video/*"
-                    className="hidden"
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={async (e) => {
-                      const files = e.target.files;
-                      if (files && files.length > 0) {
-                        setVideoFile(files[0]);
-                        setSelectedVideo(URL.createObjectURL(files[0]));
-                      }
-                    }}
-                  />
-                </div>
+                  }}
+                />
+                <label htmlFor="videoUpload">
+                  <FileVideo size={25} color="#3c538f" />
+                </label>
               </div>
 
               {selectedImage && (
@@ -199,18 +173,10 @@ const CreatePostModal = () => {
                 />
               )}
             </div>
-
             <div className="p-4 border-t">
               <DialogClose asChild>
                 <Button type="submit" variant="secondary" className="w-full rounded-lg">
-                  {loading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <Loader2 className="animate-spin" />
-                      <span>Posting...</span>
-                    </div>
-                  ) : (
-                    "Post"
-                  )}
+                  {loading ? <Loader2 className="animate-spin" /> : "Update Post"}
                 </Button>
               </DialogClose>
             </div>
@@ -221,4 +187,4 @@ const CreatePostModal = () => {
   );
 };
 
-export default CreatePostModal;
+export default UpdatePostModal;

@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const uploadToCloudinary = async (file: File, resourceType: "image" | "video"): Promise<any> => {
-  const cloud_name = "dnwytnhdx";
-  const upload_preset = "adda_app_preset";
+const cloud_name = "dnwytnhdx";
+const upload_preset = "adda_app_preset";
 
+const uploadToCloudinary = async (file: File, resourceType: "image" | "video"): Promise<any> => {
   if (!file) return null;
 
   const formData = new FormData();

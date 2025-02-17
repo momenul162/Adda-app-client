@@ -29,11 +29,21 @@ export interface LoginFormValues {
   password: string;
 }
 
+/* form interface */
 export interface createPostValue {
   visibility: string;
   body?: string;
   image?: FileList | null;
   video?: FileList | null;
+}
+
+/* form interface */
+export interface postValueInterface {
+  userId: string;
+  visibility: string;
+  body?: string | null;
+  video?: string | null;
+  image?: string | null;
 }
 
 export interface FriendType {
@@ -49,6 +59,7 @@ export interface User {
   isActive?: string;
   country: string;
   photo: string;
+  coverPhoto: string;
   phone: string;
   bio?: string;
   occupation: string;
@@ -57,6 +68,18 @@ export interface User {
   friends: FriendType[];
   friendRequests: FriendType[];
   sentRequests: FriendType[];
+}
+
+export interface updateUser {
+  username?: string;
+  email?: string;
+  photo?: string;
+  coverPhoto?: string;
+  phone?: string;
+  bio?: string;
+  occupation?: string;
+  dateOfBirth?: Date | string | null;
+  currentCity?: string;
 }
 
 export interface Comment {

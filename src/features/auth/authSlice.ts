@@ -1,7 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { User } from "@/model/interface";
-import { acceptRequest, fetchCurrentUser, getUserById, sendFriendRequest } from "./authAPI";
+import {
+  acceptRequest,
+  fetchCurrentUser,
+  getUserById,
+  sendFriendRequest,
+  updateUserProfile,
+} from "./authAPI";
 
 interface AuthState {
   user: User | null;
@@ -61,6 +67,20 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(getUserById.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* Update user profile */
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.currentUser = { ...state.currentUser, ...action.payload };
+      })
+      .addCase(updateUserProfile.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       })

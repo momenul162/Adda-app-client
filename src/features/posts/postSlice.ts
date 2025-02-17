@@ -5,8 +5,9 @@ import {
   fetchPost,
   fetchPostById,
   toggleReactionAPI,
+  updatePost,
 } from "./postAPI";
-import { Post } from "@/model/interface";
+import { Post, postValueInterface } from "@/model/interface";
 
 interface PostState {
   posts: Post[];
@@ -47,13 +48,7 @@ export const toggleReaction = createAsyncThunk(
 
 export const addPost = createAsyncThunk(
   "posts/addPostSlice",
-  async (newPost: {
-    userId: string;
-    visibility: string;
-    body?: string | null;
-    video?: string | null;
-    image?: string | null;
-  }) => {
+  async (newPost: postValueInterface) => {
     const response = await addNewPostAPI(newPost);
     return response;
   }
@@ -131,6 +126,23 @@ const postSlice = createSlice({
         state.posts.unshift(action.payload.post);
       })
       .addCase(addPost.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* Update post */
+      .addCase(updatePost.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(updatePost.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log(action.payload);
+        state.posts = state.posts.map((post) =>
+          post._id === action.payload._id ? action.payload : post
+        );
+      })
+      .addCase(updatePost.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       })
