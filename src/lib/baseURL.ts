@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080";
+const API_URL = "https://adda-server-zeta.vercel.app";
 
 // Create an axios instance
 const baseURL = axios.create({

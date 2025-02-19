@@ -26,8 +26,8 @@ const AsideSection = () => {
   };
 
   return (
-    <aside className="mt-4 lg:border lg:fixed">
-      <div className="mb-6 max-w-2xl">
+    <aside className="mt-4 lg:border lg:fixed max-w-2xl sm:max-w-md md:max-w-2xl lg:max-w-xs">
+      <div className="mb-6">
         {/* Profile Section */}
         <Card className="mb-4 rounded-none shadow-sm border">
           <CardContent className="flex flex-col items-center text-center">
