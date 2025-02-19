@@ -19,6 +19,8 @@ import { Post } from "@/model/interface";
 import { getCommentByPostId } from "@/features/comment/commentSlice";
 import { getTimeCompare } from "@/lib/getTimeCompare";
 import CommentsCard from "../comments-card/CommentsCard";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
+import UpdatePostModal from "../UpdatePostModal";
 
 interface PostCardProps {
   post: Post;
@@ -26,7 +28,7 @@ interface PostCardProps {
 
 const DialogPost: React.FC<PostCardProps> = ({ post }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { currentUser } = useSelector((state: RootState) => state.auth);
   const comments = useSelector((state: RootState) => state.comments.comments);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -37,11 +39,11 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
 
   /* handle user reaction on post */
   const handleReaction = (type: string) => {
-    if (!user?._id) {
+    if (!currentUser?._id) {
       return;
     }
 
-    dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
+    dispatch(toggleReaction({ postId: post?._id, userId: currentUser._id, type }));
   };
 
   useEffect(() => {
@@ -74,12 +76,12 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
   }, []);
 
   // Check if user has already liked the post
-  const hasLiked = post.likes?.includes(user?._id);
-  const hasDisliked = post.dislikes?.includes(user?._id);
+  const hasLiked = post.likes?.includes(currentUser?._id);
+  const hasDisliked = post.dislikes?.includes(currentUser?._id);
 
   /* handle post remove */
   const handleRemove = (id: string) => {
-    if (user?._id !== post.userId?._id) {
+    if (currentUser?._id !== post.userId?._id) {
       return;
     }
 
@@ -128,15 +130,28 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
               <DropdownMenuContent className="w-30 bg-white">
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <FilePenLine /> Edit Post
-                  </DropdownMenuItem>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      {currentUser?._id === post?.userId?._id && (
+                        <DropdownMenuItem
+                          className="flex items-center gap-2 cursor-pointer"
+                          onSelect={(e) => e.preventDefault()} // Prevents menu from closing
+                        >
+                          <FilePenLine size={16} /> Edit Post
+                        </DropdownMenuItem>
+                      )}
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogTitle>Edit Post</DialogTitle>
+                      <UpdatePostModal post={post} />
+                    </DialogContent>
+                  </Dialog>
                   <DropdownMenuItem>
                     <Link2 /> Copy Link
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                {user?._id === post?.userId?._id && (
+                {currentUser?._id === post?.userId?._id && (
                   <DropdownMenuLabel
                     onClick={() => handleRemove(post._id)}
                     className="flex items-center gap-2 cursor-default"

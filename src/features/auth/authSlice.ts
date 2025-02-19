@@ -3,8 +3,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/model/interface";
 import {
   acceptRequest,
+  cancelFriendRequest,
   fetchCurrentUser,
   getUserById,
+  rejectRequest,
   sendFriendRequest,
   updateUserProfile,
 } from "./authAPI";
@@ -85,37 +87,62 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* Friend request */
+      /* send fd request */
       .addCase(sendFriendRequest.pending, (state) => {
         state.error = null;
         state.loading = true;
       })
       .addCase(sendFriendRequest.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        if (state.currentUser) {
-          state.currentUser.sentRequests.push(action.payload.friendId);
-        }
+        state.currentUser = action.payload.user;
+        state.user = action.payload.friend;
       })
       .addCase(sendFriendRequest.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      /* Friend request */
+      /* cancel friend request */
+      .addCase(cancelFriendRequest.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(cancelFriendRequest.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.currentUser = action.payload.user;
+        state.user = action.payload.friend;
+      })
+      .addCase(cancelFriendRequest.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* accept request */
       .addCase(acceptRequest.pending, (state) => {
         state.error = null;
         state.loading = true;
       })
       .addCase(acceptRequest.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        if (state.currentUser) {
-          state.currentUser.friendRequests = state.currentUser.friendRequests.filter(
-            (id) => id !== action.payload.friendId
-          );
-          state.currentUser.friends.push(action.payload.friendId);
-        }
+        state.currentUser = action.payload.user;
+        state.user = action.payload.friend;
       })
       .addCase(acceptRequest.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* reject request */
+      .addCase(rejectRequest.pending, (state) => {
+        state.error = null;
+        state.loading = true;
+      })
+      .addCase(rejectRequest.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.currentUser = action.payload.user;
+        state.user = action.payload.friend;
+      })
+      .addCase(rejectRequest.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

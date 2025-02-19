@@ -2,27 +2,30 @@ import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { FriendType } from "@/model/interface";
 import { UserCheck, X } from "lucide-react";
+import { FriendListSkeleton } from "../skeleton/avatar-skeleton";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const FriendSection = ({
   userId,
   handleConfirmRequest,
   handleRejectRequest,
+  handleCancelRequest,
 }: {
   userId: string | null;
   handleConfirmRequest: Function;
   handleRejectRequest: Function;
+  handleCancelRequest: Function;
 }) => {
   const [listName, setListName] = useState<string>("friends");
   const [showList, setShowList] = useState<FriendType[]>([]);
-  const { currentUser, user } = useSelector((state: RootState) => state.auth);
+  const { currentUser, user, loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     handleShowFriend("friends");
-  }, []);
+  }, [userId]);
 
   const handleShowFriend = (value: string) => {
     setListName(value);
@@ -104,52 +107,69 @@ const FriendSection = ({
             : `Sent Requests (${showList.length})`}
         </p>
 
-        {showList.length === 0 ? (
-          <p className="text-gray-500">No {listName} available.</p>
+        {loading ? (
+          <FriendListSkeleton />
         ) : (
-          showList.map((friend) => (
-            <div key={friend._id} className="flex gap-2 items-center mb-2">
-              <img
-                src={friend.photo || "/default-avatar.png"}
-                alt={friend.username}
-                className="rounded-full w-10 h-10 border hover:border-blue-500"
-              />
+          <>
+            {showList.length === 0 ? (
+              <p className="text-gray-500">No {listName} available.</p>
+            ) : (
+              showList.map((friend) => (
+                <div key={friend._id} className="flex gap-2 items-center mb-2">
+                  <img
+                    src={friend.photo || "/default-avatar.png"}
+                    alt={friend.username}
+                    className="rounded-full w-10 h-10 border hover:border-blue-500"
+                  />
 
-              <div className="flex items-center justify-between w-full">
-                <Link to={`/profile/${friend.username}`}>
-                  <h3 className="text-sm font-medium hover:underline hover:text-blue-800">
-                    {friend.username}
-                  </h3>
-                  <p className="text-xs text-gray-600">
-                    {listName === "friends"
-                      ? "You are friends"
-                      : listName === "requestFriends"
-                      ? "Wants to be your friend"
-                      : "Request sent"}
-                  </p>
-                </Link>
+                  {showList.length > 0 && (
+                    <div className="flex items-center justify-between w-full">
+                      <Link to={`/profile/${friend._id}`}>
+                        <h3 className="text-sm font-medium hover:underline hover:text-blue-800">
+                          {friend.username}
+                        </h3>
+                        <p className="text-xs text-gray-600">
+                          {listName === "friends"
+                            ? "You are friends"
+                            : listName === "requestFriends"
+                            ? "Wants to be your friend"
+                            : "Request sent"}
+                        </p>
+                      </Link>
 
-                {listName === "requestFriends" && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="bg-blue-500 text-white hover:shadow-[#94acea]"
-                      onClick={() => handleConfirmRequest(userId)}
-                    >
-                      <UserCheck />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="bg-red-400 text-white hover:text-red-500 hover:shadow-red-200"
-                      onClick={() => handleRejectRequest(userId)}
-                    >
-                      <X />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))
+                      {listName === "requestFriends" && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            className="bg-blue-500 text-white hover:shadow-[#94acea]"
+                            onClick={() => handleConfirmRequest(friend._id)}
+                          >
+                            <UserCheck />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="bg-red-400 text-white hover:text-red-500 hover:shadow-red-200"
+                            onClick={() => handleRejectRequest(friend._id)}
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      )}
+                      {listName === "sentFriends" && (
+                        <Button
+                          variant="outline"
+                          className="bg-blue-500 text-white hover:shadow-[#94acea]"
+                          onClick={() => handleCancelRequest(friend._id)}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </>
         )}
       </CardContent>
     </Card>

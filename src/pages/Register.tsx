@@ -57,7 +57,7 @@ const Register = () => {
       };
 
       try {
-        const { data } = await axios.post("http://localhost:8080/auth/sign-up", user);
+        const { data } = await axios.post("https://adda-server-zeta.vercel.app/auth/sign-up", user);
 
         if (data) {
           setLoading(false);

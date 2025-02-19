@@ -32,8 +32,20 @@ export const sendFriendRequest = createAsyncThunk(
   "auth/friendRequest",
   async (friendId: string, { rejectWithValue }) => {
     try {
-      const response = await baseURL.post(`/auth/friend-request/${friendId}`);
-      return { message: response.data.message, friendId }; // Ensure this format
+      const response = await baseURL.patch(`/auth/friend-request/${friendId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Friend request failed");
+    }
+  }
+);
+
+export const cancelFriendRequest = createAsyncThunk(
+  "auth/cancelRequest",
+  async (friendId: string, { rejectWithValue }) => {
+    try {
+      const response = await baseURL.patch(`/auth/cancel-request/${friendId}`);
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Friend request failed");
     }
@@ -44,8 +56,20 @@ export const acceptRequest = createAsyncThunk(
   "auth/acceptRequest",
   async (friendId: string, { rejectWithValue }) => {
     try {
-      const response = await baseURL.post(`/auth/accept-request/${friendId}`);
-      return { message: response.data.message, friendId }; // Ensure this format
+      const response = await baseURL.patch(`/auth/accept-request/${friendId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to accept request");
+    }
+  }
+);
+
+export const rejectRequest = createAsyncThunk(
+  "auth/rejectRequest",
+  async (friendId: string, { rejectWithValue }) => {
+    try {
+      const response = await baseURL.patch(`/auth/reject-request/${friendId}`);
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Failed to accept request");
     }

@@ -4,8 +4,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { PostCardSkeleton } from "@/components/skeleton/post-card-skeleton";
 import {
   acceptRequest,
+  cancelFriendRequest,
   fetchCurrentUser,
   getUserById,
+  rejectRequest,
   sendFriendRequest,
   updateUserProfile,
 } from "@/features/auth/authAPI";
@@ -36,12 +38,17 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import UpdateBio from "@/components/Bio/UpdateBio";
 import UpdateAbout from "@/components/about/UpdateAbout";
 import uploadToCloudinary from "@/components/upload-widget/uploadForPost";
+import { Separator } from "@/components/ui/separator";
+import clsx from "clsx";
 
 const UserProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, loading } = useSelector((state: RootState) => state.posts);
   const { currentUser, user, loading: isLoading } = useSelector((state: RootState) => state.auth);
   const { userId } = useParams();
+
+  /* handle side section */
+  const [value, setValue] = useState("");
 
   // Ensure `paramsUser` is declared before usage
   const filteredPost = posts
@@ -64,7 +71,7 @@ const UserProfile = () => {
       dispatch(getUserById(userId));
     }
     dispatch(getPosts());
-  }, [dispatch]);
+  }, [dispatch, userId]);
 
   const isFriend = currentUser?.friends?.some((friend) => friend._id === user?._id);
   const hasSentRequest = currentUser?.sentRequests?.some((req) => req._id === user?._id);
@@ -73,39 +80,32 @@ const UserProfile = () => {
   const handleAddFriend = async (receiverId: string) => {
     if (receiverId) {
       dispatch(sendFriendRequest(receiverId));
+      dispatch(fetchCurrentUser());
+      dispatch(getUserById(receiverId));
     }
   };
 
   const handleConfirmRequest = async (senderId: string) => {
-    console.log(senderId);
     if (senderId) {
       dispatch(acceptRequest(senderId));
+      dispatch(fetchCurrentUser());
+      dispatch(getUserById(senderId));
     }
   };
 
   const handleRejectRequest = async (senderId: string) => {
-    try {
-      await fetch("/api/friends/reject", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiverId: currentUser?._id, senderId }),
-      });
-      dispatch(fetchCurrentUser()); // Refresh state
-    } catch (error) {
-      console.error("Error rejecting friend request:", error);
+    if (senderId) {
+      dispatch(rejectRequest(senderId));
+      dispatch(fetchCurrentUser());
+      dispatch(getUserById(senderId));
     }
   };
 
   const handleCancelRequest = async (receiverId: string) => {
-    try {
-      await fetch("/api/friends/cancel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ senderId: currentUser?._id, receiverId }),
-      });
-      dispatch(fetchCurrentUser()); // Refresh state
-    } catch (error) {
-      console.error("Error canceling friend request:", error);
+    if (receiverId) {
+      dispatch(cancelFriendRequest(receiverId));
+      dispatch(fetchCurrentUser());
+      dispatch(getUserById(receiverId));
     }
   };
 
@@ -145,22 +145,27 @@ const UserProfile = () => {
       <Card className="mb-4 rounded-none shadow-sm border">
         <CardContent>
           <div className="relative h-48 w-full">
-            {isLoading && !coverPhoto && <CoverSkeleton />}
-            {currentUser?._id === userId ? (
-              <img
-                src={coverPhoto}
-                alt="Upload your cover photo"
-                className="w-full h-40 rounded-t-md border object-cover"
-              />
+            {isLoading && !coverPhoto ? (
+              <CoverSkeleton />
             ) : (
-              <img
-                src={user?.coverPhoto}
-                alt="Not upload cover photo yet"
-                className="w-full h-40 rounded-t-md border object-cover"
-              />
+              <>
+                {currentUser?._id === userId ? (
+                  <img
+                    src={coverPhoto}
+                    alt="Upload your cover photo"
+                    className="w-full h-48 rounded-t-md border object-cover"
+                  />
+                ) : (
+                  <img
+                    src={user?.coverPhoto}
+                    alt="Not upload cover photo yet"
+                    className="w-full h-48 rounded-t-md border object-cover"
+                  />
+                )}
+              </>
             )}
             {currentUser?._id === userId && (
-              <div className="absolute bottom-10 right-2">
+              <div className="absolute bottom-4 right-2">
                 <input
                   type="file"
                   accept="image/*"
@@ -176,23 +181,28 @@ const UserProfile = () => {
           </div>
 
           {/* Profile Photo */}
-          <div className="relative w-32 h-32 -mt-16 mx-auto">
-            {isLoading && !profilePhoto && <AvatarSkeletonFull />}
-            {currentUser?._id === userId ? (
-              <img
-                src={profilePhoto}
-                alt="Profile"
-                className="w-32 h-32 border-2 border-[#94acea] rounded-full object-cover"
-              />
+          <div className="relative w-48 h-48 -mt-20 mx-auto">
+            {isLoading && !profilePhoto ? (
+              <AvatarSkeletonFull />
             ) : (
-              <img
-                src={user?.photo}
-                alt="Profile"
-                className="w-32 h-32 border-2 border-[#94acea] rounded-full object-cover"
-              />
+              <>
+                {currentUser?._id === userId ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="w-48 h-48 border-2 border-[#94acea] rounded-full"
+                  />
+                ) : (
+                  <img
+                    src={user?.photo}
+                    alt="Profile"
+                    className="w-48 h-48 border-2 border-[#94acea] rounded-full"
+                  />
+                )}
+              </>
             )}
             {currentUser?._id === userId && (
-              <div className="absolute bottom-2 right-2">
+              <div className="absolute bottom-6 right-3">
                 <input
                   type="file"
                   accept="image/*"
@@ -284,15 +294,21 @@ const UserProfile = () => {
           </div>
         </CardContent>
         <CardFooter className="block md:hidden">
-          <Button variant={"outline"}>About info</Button>
-          <Button variant={"outline"}>Friends</Button>
+          <Button variant={"outline"} onClick={() => setValue("about")}>
+            About info
+          </Button>
+          <Button variant={"outline"} onClick={() => setValue("friends")}>
+            Friends
+          </Button>
         </CardFooter>
       </Card>
 
       {/* Friends List */}
       <div className="container mx-auto md:flex justify-center md:justify-between gap-6 2xl:gap-4">
-        <section className="hidden md:block">
-          <Card className="w-[350px] py-4 mb-2">
+        <section>
+          <Card
+            className={clsx("w-[350px] py-4 mb-2 md:block", value === "about" ? "block" : "hidden")}
+          >
             <CardHeader className="flex items-center justify-between">
               <CardTitle>About</CardTitle>
               {currentUser?._id === userId && (
@@ -358,18 +374,24 @@ const UserProfile = () => {
           </Card>
 
           {/* Friend section */}
-          <FriendSection
-            userId={userId ?? null}
-            handleConfirmRequest={handleConfirmRequest}
-            handleRejectRequest={handleRejectRequest}
-          />
+          <div className={clsx("md:block", value === "friends" ? "block" : "hidden")}>
+            <FriendSection
+              userId={userId ?? null}
+              handleConfirmRequest={handleConfirmRequest}
+              handleRejectRequest={handleRejectRequest}
+              handleCancelRequest={handleCancelRequest}
+            />
+          </div>
         </section>
         <Card className="max-w-lg">
           <p className="text-center my-2 text-2xl text-gray-700 font-bold">Your Timelines</p>
           <div className="max-w-lg">
             {loading && <PostCardSkeleton />}
             {filteredPost.length === 0 ? (
-              <p className="w-lg">Post is empty</p>
+              <>
+                <Separator className="my-4" />
+                <p className="w-[24rem] text-center font-semibold mt-6">Post is empty</p>
+              </>
             ) : (
               filteredPost.map((post) => <PostCard key={post._id} post={post} />)
             )}

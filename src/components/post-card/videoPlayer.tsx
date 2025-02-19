@@ -34,6 +34,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { commentSchema } from "@/model/schema";
 import { postComment } from "@/features/comment/commentSlice";
 import { getTimeCompare } from "@/lib/getTimeCompare";
+import UpdatePostModal from "../UpdatePostModal";
 
 interface PostCardProps {
   post: Post;
@@ -41,7 +42,7 @@ interface PostCardProps {
 
 const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { currentUser } = useSelector((state: RootState) => state.auth);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const { register, handleSubmit, reset } = useForm<{ body: string }>({
@@ -49,10 +50,10 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
   });
 
   const onSubmit = ({ body }: { body: string }) => {
-    if (!user?._id) {
+    if (!currentUser?._id) {
       return;
     }
-    const payload = { userId: user?._id, postId: post._id, body };
+    const payload = { userId: currentUser?._id, postId: post._id, body };
     console.log(payload);
 
     dispatch(postComment(payload)).then(() => {
@@ -120,20 +121,20 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
 
   /* Handle user reaction */
   const handleReaction = (type: string) => {
-    if (!user?._id) {
+    if (!currentUser?._id) {
       return;
     }
 
-    dispatch(toggleReaction({ postId: post?._id, userId: user._id, type }));
+    dispatch(toggleReaction({ postId: post?._id, userId: currentUser._id, type }));
   };
 
   // Check if user has already liked the post
-  const hasLiked = post.likes?.includes(user?._id);
-  const hasDisliked = post.dislikes?.includes(user?._id);
+  const hasLiked = post.likes?.includes(currentUser?._id);
+  const hasDisliked = post.dislikes?.includes(currentUser?._id);
 
   /* Handle post delete */
   const handleRemove = (id: string) => {
-    if (user?._id !== post.userId?._id) {
+    if (currentUser?._id !== post.userId?._id) {
       return;
     }
 
@@ -183,15 +184,28 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
             <DropdownMenuContent className="w-30 bg-white">
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <FilePenLine /> Edit Post
-                </DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    {currentUser?._id === post?.userId?._id && (
+                      <DropdownMenuItem
+                        className="flex items-center gap-2 cursor-pointer"
+                        onSelect={(e) => e.preventDefault()} // Prevents menu from closing
+                      >
+                        <FilePenLine size={16} /> Edit Post
+                      </DropdownMenuItem>
+                    )}
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogTitle>Edit Post</DialogTitle>
+                    <UpdatePostModal post={post} />
+                  </DialogContent>
+                </Dialog>
                 <DropdownMenuItem onClick={handleCopyLink}>
                   <Link2 /> Copy Link
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              {user?._id === post?.userId?._id && (
+              {currentUser?._id === post?.userId?._id && (
                 <DropdownMenuLabel
                   onClick={() => handleRemove(post._id)}
                   className="flex items-center gap-2 cursor-default"
@@ -244,7 +258,7 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
               </Button>
             </DialogTrigger>
             <DialogContent id="dialog-post" className="bg-white max-w-2xl max-h-screen">
-              <DialogTitle>{`${user?.username}'s post`}</DialogTitle>
+              <DialogTitle>{`${post.userId?.username}'s post`}</DialogTitle>
               <ScrollArea className="max-h-[700px]">
                 <DialogPost post={post} />
                 <ScrollBar orientation="vertical" />
@@ -252,7 +266,7 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <DialogFooter>
                   <img
-                    src={user?.photo}
+                    src={currentUser?.photo}
                     alt="Post Image"
                     style={{ objectFit: "cover" }}
                     className="rounded-full w-10 h-10 border hover:border-blue-500"
@@ -260,7 +274,7 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
                   <Textarea
                     id="body"
                     className="shadow-md w-full focus:border-gray-400 focus:border-2"
-                    placeholder={`Comment as ${user?.username}?`}
+                    placeholder={`Comment as ${currentUser?.username}?`}
                     {...register("body")}
                   />
                   <button type="submit">

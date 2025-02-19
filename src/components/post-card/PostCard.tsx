@@ -270,7 +270,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                 </Button>
               </DialogTrigger>
               <DialogContent id="dialog-post" className="bg-white max-w-2xl max-h-screen">
-                <DialogTitle>{`${currentUser?.username}'s post`}</DialogTitle>
+                <DialogTitle>{`${post.userId?.username}'s post`}</DialogTitle>
                 <ScrollArea className="max-h-[700px]">
                   <DialogPost post={post} />
                   <ScrollBar orientation="vertical" />
