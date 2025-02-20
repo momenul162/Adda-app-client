@@ -9,6 +9,8 @@ import {
   Link2,
   Lock,
   SendHorizontal,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
   Users,
 } from "lucide-react";
@@ -35,6 +37,7 @@ import { commentSchema } from "@/model/schema";
 import { postComment } from "@/features/comment/commentSlice";
 import { getTimeCompare } from "@/lib/getTimeCompare";
 import UpdatePostModal from "../UpdatePostModal";
+import clsx from "clsx";
 
 interface PostCardProps {
   post: Post;
@@ -251,14 +254,22 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
               variant={"outline"}
               className="border-none hover:bg-blue-200 hover:text-black"
             >
-              {post.likes?.length || ""} {hasLiked ? "Liked" : "Like"}
+              {post.likes?.length || ""}{" "}
+              <ThumbsUp
+                color={clsx(hasLiked ? "blue" : "black")}
+                strokeWidth={clsx(hasLiked ? "3" : "2")}
+              />
             </Button>
             <Button
               onClick={() => handleReaction("dislike")}
               variant={"outline"}
               className="border-non hover:bg-blue-200 hover:text-black"
             >
-              {post.dislikes?.length || ""} {hasDisliked ? "Disliked" : "Dislike"}
+              {post.dislikes?.length || ""}{" "}
+              <ThumbsDown
+                color={clsx(hasDisliked ? "blue" : "black")}
+                strokeWidth={clsx(hasDisliked ? "3" : "2")}
+              />
             </Button>
             <Dialog>
               <DialogTrigger asChild>

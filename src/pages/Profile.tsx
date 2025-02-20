@@ -38,7 +38,6 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import UpdateBio from "@/components/Bio/UpdateBio";
 import UpdateAbout from "@/components/about/UpdateAbout";
 import uploadToCloudinary from "@/components/upload-widget/uploadForPost";
-import { Separator } from "@/components/ui/separator";
 import clsx from "clsx";
 
 const UserProfile = () => {
@@ -383,18 +382,15 @@ const UserProfile = () => {
             />
           </div>
         </section>
-        <Card className="flex flex-col items-center justify-center">
-          <p className="text-center my-2 text-2xl text-gray-700 font-bold">Your Timelines</p>
-          <div className="w-[390px] md:min-w-[380px] lg:w-[480px]">
+        <Card>
+          <p className="text-center my-2 text-2xl text-gray-700 font-bold">
+            {filteredPost.length ? "Your Timelines" : "Post is empty"}
+          </p>
+          <div className="mx-auto w-[390px] md:min-w-[380px] lg:w-[480px]">
             {loading ? (
               <PostCardSkeleton />
-            ) : filteredPost.length === 0 ? (
-              <>
-                <Separator className="my-4" />
-                <p className="w-[24rem] text-center font-semibold mt-6">Post is empty</p>
-              </>
             ) : (
-              filteredPost.map((post) => <PostCard key={post._id} post={post} />)
+              filteredPost && filteredPost.map((post) => <PostCard key={post._id} post={post} />)
             )}
           </div>
         </Card>

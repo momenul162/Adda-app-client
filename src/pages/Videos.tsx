@@ -1,5 +1,5 @@
 import VideoPlayer from "@/components/post-card/videoPlayer";
-import { PostCardSkeleton } from "@/components/skeleton/post-card-skeleton";
+import { VideoCardSkeleton } from "@/components/skeleton/video-card-skeleton";
 import { getPosts } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
 import { useEffect } from "react";
@@ -13,9 +13,9 @@ const Videos = () => {
     disPatch(getPosts());
   }, [disPatch]);
   return (
-    <div>
+    <div className="">
       {loading ? (
-        <PostCardSkeleton />
+        <VideoCardSkeleton />
       ) : (
         <>{posts && posts.map((post: any) => <VideoPlayer key={post?._id} post={post} />)}</>
       )}
