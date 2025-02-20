@@ -304,7 +304,7 @@ const UserProfile = () => {
       </Card>
 
       {/* Friends List */}
-      <div className="container mx-auto md:flex justify-center md:justify-between gap-6 2xl:gap-4">
+      <div className="container mx-auto md:flex justify-center lg:justify-between gap-4 2xl:gap-4">
         <section>
           <Card
             className={clsx("w-[350px] py-4 mb-2 md:block", value === "about" ? "block" : "hidden")}
@@ -383,11 +383,12 @@ const UserProfile = () => {
             />
           </div>
         </section>
-        <Card className="max-w-lg">
+        <Card className="flex flex-col items-center justify-center">
           <p className="text-center my-2 text-2xl text-gray-700 font-bold">Your Timelines</p>
-          <div className="max-w-lg">
-            {loading && <PostCardSkeleton />}
-            {filteredPost.length === 0 ? (
+          <div className="w-[390px] md:min-w-[380px] lg:w-[480px]">
+            {loading ? (
+              <PostCardSkeleton />
+            ) : filteredPost.length === 0 ? (
               <>
                 <Separator className="my-4" />
                 <p className="w-[24rem] text-center font-semibold mt-6">Post is empty</p>

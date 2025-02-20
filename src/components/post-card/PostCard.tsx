@@ -148,7 +148,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
   return (
     <div>
-      <Card className="my-4 w-full shadow-lg mx-auto border">
+      <Card className="my-4 shadow-lg mx-auto border">
         {/* ... (rest of the component remains the same) */}
         <CardHeader className="justify-between">
           {/* Placeholder for Author Avatar (replace with actual image) */}

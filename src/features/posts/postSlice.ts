@@ -98,10 +98,8 @@ const postSlice = createSlice({
       /* handle user reaction */
       .addCase(toggleReaction.pending, (state) => {
         state.error = null;
-        state.loading = true;
       })
       .addCase(toggleReaction.fulfilled, (state, action) => {
-        state.loading = false;
         const updatedPost = action.payload;
 
         const index = state.posts.findIndex((post) => post._id === updatedPost._id);
@@ -111,7 +109,6 @@ const postSlice = createSlice({
         }
       })
       .addCase(toggleReaction.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
         state.error = action.payload;
       })
 

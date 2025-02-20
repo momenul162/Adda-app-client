@@ -22,7 +22,7 @@ const Home = () => {
       <section className="">
         <AsideSection />
       </section>
-      <section className="max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-md 2xl:max-w-2xl">
+      <section className="max-w-xl sm:max-w-xl md:max-w-2xl lg:max-w-xl xl:max-w-2xl">
         <PostInputBox />
         <div>
           {loading ? (
