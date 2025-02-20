@@ -9,6 +9,8 @@ import {
   Link2,
   Lock,
   SendHorizontal,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
   Users,
 } from "lucide-react";
@@ -35,6 +37,8 @@ import { commentSchema } from "@/model/schema";
 import { postComment } from "@/features/comment/commentSlice";
 import { getTimeCompare } from "@/lib/getTimeCompare";
 import UpdatePostModal from "../UpdatePostModal";
+import clsx from "clsx";
+import { Separator } from "../ui/separator";
 
 interface PostCardProps {
   post: Post;
@@ -239,14 +243,22 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
             variant={"outline"}
             className="border-none hover:bg-blue-200 hover:text-black"
           >
-            {post.likes?.length || ""} {hasLiked ? "Liked" : "Like"}
+            {post.likes?.length || ""}{" "}
+            <ThumbsUp
+              color={clsx(hasLiked ? "blue" : "black")}
+              strokeWidth={clsx(hasLiked ? "3" : "2")}
+            />
           </Button>
           <Button
             onClick={() => handleReaction("dislike")}
             variant={"outline"}
             className="border-non hover:bg-blue-200 hover:text-black"
           >
-            {post.dislikes?.length || ""} {hasDisliked ? "Disliked" : "Dislike"}
+            {post.dislikes?.length || ""}
+            <ThumbsDown
+              color={clsx(hasDisliked ? "blue" : "black")}
+              strokeWidth={clsx(hasDisliked ? "3" : "2")}
+            />
           </Button>
           <Dialog>
             <DialogTrigger asChild>
@@ -263,8 +275,9 @@ const VideoPlayer: React.FC<PostCardProps> = ({ post }) => {
                 <DialogPost post={post} />
                 <ScrollBar orientation="vertical" />
               </ScrollArea>
+              <Separator className="bg-gray-300" />
               <form onSubmit={handleSubmit(onSubmit)}>
-                <DialogFooter>
+                <DialogFooter className="flex flex-row items-start gap-1 md:gap-2 mb-2">
                   <img
                     src={currentUser?.photo}
                     alt="Post Image"

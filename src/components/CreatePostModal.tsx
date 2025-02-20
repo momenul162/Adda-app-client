@@ -202,7 +202,12 @@ const CreatePostModal = () => {
 
             <div className="p-4 border-t">
               <DialogClose asChild>
-                <Button type="submit" variant="secondary" className="w-full rounded-lg">
+                <Button
+                  type="submit"
+                  disabled={loading || !(watch("body")?.trim() || selectedImage || selectedVideo)}
+                  variant="secondary"
+                  className="w-full rounded-lg"
+                >
                   {loading ? (
                     <div className="flex items-center justify-center space-x-2">
                       <Loader2 className="animate-spin" />

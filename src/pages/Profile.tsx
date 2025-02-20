@@ -143,7 +143,7 @@ const UserProfile = () => {
       {/* Cover Photo */}
       <Card className="mb-4 rounded-none shadow-sm border">
         <CardContent>
-          <div className="relative h-48 w-full">
+          <div className="relative h-32 md:h-48 w-full">
             {isLoading && !coverPhoto ? (
               <CoverSkeleton />
             ) : (
@@ -152,19 +152,19 @@ const UserProfile = () => {
                   <img
                     src={coverPhoto}
                     alt="Upload your cover photo"
-                    className="w-full h-48 rounded-t-md border object-cover"
+                    className="w-full h-32 md:h-48 rounded-t-md border object-cover"
                   />
                 ) : (
                   <img
                     src={user?.coverPhoto}
                     alt="Not upload cover photo yet"
-                    className="w-full h-48 rounded-t-md border object-cover"
+                    className="w-full h-32 md:h-48 rounded-t-md border object-cover"
                   />
                 )}
               </>
             )}
             {currentUser?._id === userId && (
-              <div className="absolute bottom-4 right-2">
+              <div className="absolute bottom-1 right-1 md:bottom-4 md:right-2">
                 <input
                   type="file"
                   accept="image/*"
@@ -180,7 +180,7 @@ const UserProfile = () => {
           </div>
 
           {/* Profile Photo */}
-          <div className="relative w-48 h-48 -mt-20 mx-auto">
+          <div className="relative w-32 h-32 md:w-48 md:h-48 -mt-20 mx-auto">
             {isLoading && !profilePhoto ? (
               <AvatarSkeletonFull />
             ) : (
@@ -189,19 +189,19 @@ const UserProfile = () => {
                   <img
                     src={profilePhoto}
                     alt="Profile"
-                    className="w-48 h-48 border-2 border-[#94acea] rounded-full"
+                    className="w-32 h-32 md:w-48 md:h-48 border-2 border-[#94acea] rounded-full"
                   />
                 ) : (
                   <img
                     src={user?.photo}
                     alt="Profile"
-                    className="w-48 h-48 border-2 border-[#94acea] rounded-full"
+                    className="h-32 md:w-48 md:h-48 border-2 border-[#94acea] rounded-full"
                   />
                 )}
               </>
             )}
             {currentUser?._id === userId && (
-              <div className="absolute bottom-6 right-3">
+              <div className="absolute bottom-3 right-2 md:bottom-6 md:right-3">
                 <input
                   type="file"
                   accept="image/*"
@@ -216,7 +216,7 @@ const UserProfile = () => {
             )}
           </div>
 
-          <div className="mx-5 pb-2 flex justify-between items-center">
+          <div className="mx-5 pb-2 flex justify-between items-center mt-4">
             <div>
               <div className="flex items-center gap-4">
                 <h3 className="text-xl font-bold">
@@ -278,7 +278,7 @@ const UserProfile = () => {
             {currentUser?._id === userId ? (
               <Dialog>
                 <DialogTrigger>
-                  <Edit />
+                  <Edit size={16} />
                 </DialogTrigger>
                 <DialogContent className="bg-slate-300">
                   <DialogTitle>Update Name & Bio</DialogTitle>
@@ -386,7 +386,7 @@ const UserProfile = () => {
           <p className="text-center my-2 text-2xl text-gray-700 font-bold">
             {filteredPost.length ? "Your Timelines" : "Post is empty"}
           </p>
-          <div className="mx-auto w-[390px] md:min-w-[380px] lg:w-[480px]">
+          <div className="mx-auto w-full md:min-w-[380px] lg:w-[480px]">
             {loading ? (
               <PostCardSkeleton />
             ) : (

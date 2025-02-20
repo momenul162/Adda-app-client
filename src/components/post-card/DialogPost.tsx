@@ -2,7 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { deletePost, toggleReaction } from "@/features/posts/postSlice";
 import { AppDispatch, RootState } from "@/store";
-import { Ellipsis, FilePenLine, Globe, Link2, Lock, Trash2, Users } from "lucide-react";
+import {
+  Ellipsis,
+  FilePenLine,
+  Globe,
+  Link2,
+  Lock,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -21,6 +31,7 @@ import { getTimeCompare } from "@/lib/getTimeCompare";
 import CommentsCard from "../comments-card/CommentsCard";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
 import UpdatePostModal from "../UpdatePostModal";
+import clsx from "clsx";
 
 interface PostCardProps {
   post: Post;
@@ -194,14 +205,22 @@ const DialogPost: React.FC<PostCardProps> = ({ post }) => {
               variant={"outline"}
               className="border-none hover:bg-blue-200 hover:text-black"
             >
-              {post.likes?.length || ""} {hasLiked ? "Liked" : "Like"}
+              {post.likes?.length || ""}
+              <ThumbsUp
+                color={clsx(hasLiked ? "blue" : "black")}
+                strokeWidth={clsx(hasLiked ? "3" : "2")}
+              />
             </Button>
             <Button
               onClick={() => handleReaction("dislike")}
               variant={"outline"}
               className="border-non hover:bg-blue-200 hover:text-black"
             >
-              {post.dislikes?.length || ""} {hasDisliked ? "Disliked" : "Dislike"}
+              {post.dislikes?.length || ""}{" "}
+              <ThumbsDown
+                color={clsx(hasDisliked ? "blue" : "black")}
+                strokeWidth={clsx(hasDisliked ? "3" : "2")}
+              />
             </Button>
             <Button variant={"outline"} className="border-none hover:bg-blue-200 hover:text-black">
               Comments

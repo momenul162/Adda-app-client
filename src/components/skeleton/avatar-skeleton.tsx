@@ -1,7 +1,7 @@
 import { Skeleton } from "../ui/skeleton";
 
 export const AvatarSkeletonFull = () => {
-  return <Skeleton className="w-48 h-48 rounded-full bg-gray-300" />;
+  return <Skeleton className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-gray-300" />;
 };
 
 export const AvatarSkeletonMid = () => {
@@ -15,7 +15,7 @@ export const AvatarSkeleton = () => {
 };
 
 export const CoverSkeleton = () => {
-  return <Skeleton className="h-48 w-full bg-gray-300" />;
+  return <Skeleton className="h-32 md:h-48 w-full bg-gray-300" />;
 };
 
 export const CoverSkeletonMid = () => {

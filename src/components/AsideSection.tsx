@@ -37,7 +37,7 @@ const AsideSection = () => {
                 <CoverSkeletonMid />
               ) : (
                 <img
-                  src="https://cdn.pixabay.com/photo/2020/06/18/17/08/sunset-5314319_1280.jpg"
+                  src={currentUser?.coverPhoto}
                   alt="Background"
                   className="w-full h-28 rounded-t-md object-cover"
                 />

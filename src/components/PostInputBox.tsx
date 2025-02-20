@@ -12,7 +12,7 @@ const PostInputBox = () => {
   const { currentUser, loading } = useSelector((state: RootState) => state.auth);
 
   return (
-    <div className="shadow-xl mx-auto bg-white p-4 mt-4 w-[580px] md:w-[668px] lg:w-[500px] xl:w-[668px]">
+    <div className="shadow-xl mx-auto bg-white p-4 mt-4 w-full md:w-[668px] lg:w-[500px] xl:w-[668px]">
       {/* Input Section */}
       <div className="flex items-center space-x-3 mb-4">
         {/* Profile Picture */}
