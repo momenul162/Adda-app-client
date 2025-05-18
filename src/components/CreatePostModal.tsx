@@ -46,6 +46,12 @@ const CreatePostModal = () => {
       return;
     }
 
+    if ((!data.body || !data.body.trim()) && !imageFile && !videoFile) {
+      setLoading(false);
+      alert("Post cannot be empty.");
+      return;
+    }
+
     let imageUrl: string | null = null;
     let videoUrl: string | null = null;
 
