@@ -1,50 +1,97 @@
-# React + TypeScript + Vite
+# Adda Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern social media client built with **React**, **Redux Toolkit**, **TypeScript**, and **Vite**. This project features authentication, posts, comments, user profiles, and more, styled with Tailwind CSS and Radix UI components.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User authentication (register, login)
+- Create, update, and delete posts (with image/video upload)
+- Like/dislike and comment on posts
+- User profiles with editable bio/about
+- Friends and follow system
+- Responsive, modern UI with Tailwind CSS
+- Modular, scalable code structure
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [React](https://react.dev/)
+- [Redux Toolkit](https://redux-toolkit.js.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Axios](https://axios-http.com/)
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- pnpm (or npm/yarn)
+
+### Installation
+
+1. Clone the repository:
+   ```sh
+   git clone <repo-url>
+   cd adda-client
+   ```
+2. Install dependencies:
+   ```sh
+   pnpm install
+   # or
+   npm install
+   ```
+
+### Development
+
+Start the development server:
+
+```sh
+pnpm dev
+# or
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Build
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+To build for production:
+
+```sh
+pnpm build
+# or
+npm run build
 ```
+
+### Lint
+
+To lint the codebase:
+
+```sh
+pnpm lint
+# or
+npm run lint
+```
+
+## Project Structure
+
+- `src/` — Main source code
+  - `components/` — Reusable UI components
+  - `features/` — Redux slices and API logic
+  - `hooks/` — Custom React hooks
+  - `layout/` — Layout components (Navbar, Footer, etc.)
+  - `model/` — TypeScript interfaces and schemas
+  - `pages/` — Route pages (Home, Login, Profile, etc.)
+  - `routes/` — App routing
+  - `store/` — Redux store setup
+  - `lib/` — Utility functions
+
+## API
+
+This client connects to a backend API (default: `https://adda-server-zeta.vercel.app`). You can change the API base URL in `src/lib/baseURL.ts`.
+
+## License
+
+MIT
